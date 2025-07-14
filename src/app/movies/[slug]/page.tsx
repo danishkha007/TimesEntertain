@@ -20,6 +20,7 @@ import { CastMemberCard } from '@/components/CastMemberCard';
 import { FullCastDialog } from '@/components/FullCastDialog';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { SimilarMovies } from '@/components/SimilarMovies';
+import { WatchProviders } from '@/components/WatchProviders';
 
 export async function generateStaticParams() {
   try {
@@ -221,6 +222,8 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             <p className="text-lg mb-6">{movie.overview}</p>
 
             <AddToWatchlistButton item={movie} type="movies" />
+
+            {movie.watch_providers && <WatchProviders providers={movie.watch_providers} />}
 
             {movie.production && movie.production.length > 0 && (
                 <div className="mt-6">

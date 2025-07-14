@@ -35,6 +35,12 @@ export interface Video {
   url: string;
 }
 
+export interface WatchProvider {
+  provider_name: string;
+  provider_logo_url: string;
+  link: string;
+}
+
 export interface ContentItem {
   id: number;
   title: string;
@@ -52,6 +58,7 @@ export interface Movie extends ContentItem {
   crew_ids: number[];
   production_company_ids: number[];
   videos?: Video[];
+  watch_providers?: WatchProvider[];
 
   // Populated fields
   cast?: (Person & { character?: string })[];
