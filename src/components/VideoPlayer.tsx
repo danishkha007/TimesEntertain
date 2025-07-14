@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { PlayCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 interface VideoPlayerProps {
   videos: Video[];
@@ -23,6 +24,13 @@ const getEmbedUrl = (video: Video) => {
     }
     return video.url; // Fallback
 };
+
+const getThumbnailUrl = (video: Video) => {
+    if (video.site === 'YouTube' && video.key) {
+      return `https://img.youtube.com/vi/${video.key}/mqdefault.jpg`;
+    }
+    return null;
+  };
 
 export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
   // Prioritize trailers, then clips, then the first video
@@ -70,28 +78,36 @@ export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
         <div className="lg:col-span-1">
           <ScrollArea className="h-[27rem] pr-4 border rounded-lg">
             <div className="flex flex-col">
-              {videos.map((video, index) => (
-                <button
-                  key={video.key || video.url}
-                  onClick={() => setSelectedVideo(video)}
-                  className={cn(
-                    "flex items-center gap-4 p-3 text-left transition-colors w-full",
-                    selectedVideo.key === video.key ? "bg-accent" : "hover:bg-accent/50",
-                    index !== 0 && "border-t"
-                  )}
-                >
-                  <div className="relative w-12 h-12 bg-muted rounded-md shrink-0 flex items-center justify-center">
-                     <PlayCircle className="w-6 h-6 text-muted-foreground" />
-                  </div>
-                  <div className="flex-grow">
-                    <h4 className="font-semibold text-sm leading-tight line-clamp-2">{video.name}</h4>
-                    <div className="flex items-center gap-2 mt-1">
-                        <p className="text-xs text-muted-foreground">{video.type}</p>
-                        {video.official && <Badge variant="secondary" className="px-1.5 py-0 text-xs">Official</Badge>}
+              {videos.map((video, index) => {
+                const thumbnailUrl = getThumbnailUrl(video);
+                return (
+                    <button
+                    key={video.key || video.url}
+                    onClick={() => setSelectedVideo(video)}
+                    className={cn(
+                        "flex items-center gap-4 p-3 text-left transition-colors w-full",
+                        selectedVideo.key === video.key ? "bg-accent" : "hover:bg-accent/50",
+                        index !== 0 && "border-t"
+                    )}
+                    >
+                    <div className="relative w-28 h-16 bg-muted rounded-md shrink-0 flex items-center justify-center overflow-hidden">
+                        {thumbnailUrl ? (
+                            <Image src={thumbnailUrl} alt={`Thumbnail for ${video.name}`} layout="fill" objectFit="cover" />
+                        ) : null}
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                            <PlayCircle className="w-8 h-8 text-white/80" />
+                        </div>
                     </div>
-                  </div>
-                </button>
-              ))}
+                    <div className="flex-grow">
+                        <h4 className="font-semibold text-sm leading-tight line-clamp-2">{video.name}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                            <p className="text-xs text-muted-foreground">{video.type}</p>
+                            {video.official && <Badge variant="secondary" className="px-1.5 py-0 text-xs">Official</Badge>}
+                        </div>
+                    </div>
+                    </button>
+                )
+              })}
             </div>
           </ScrollArea>
         </div>
