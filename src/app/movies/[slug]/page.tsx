@@ -18,6 +18,7 @@ import {
 import { CastMemberCard } from '@/components/CastMemberCard';
 import { FullCastDialog } from '@/components/FullCastDialog';
 import { VideoPlayer } from '@/components/VideoPlayer';
+import { SimilarMovies } from '@/components/SimilarMovies';
 
 export async function generateStaticParams() {
   try {
@@ -263,6 +264,10 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
 
         {movie.videos && movie.videos.length > 0 && (
           <VideoPlayer videos={movie.videos} movieTitle={movie.title} />
+        )}
+
+        {movie.cast && movie.cast.length > 0 && (
+          <SimilarMovies currentMovieId={movie.id} cast={movie.cast} />
         )}
       </article>
     </>
