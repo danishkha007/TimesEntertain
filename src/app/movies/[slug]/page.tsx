@@ -1,31 +1,40 @@
-"use client"
-
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
 import type { Movie, Person, ProductionCompany, Video } from '@/lib/types';
-import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { promises as fs } from 'fs';
+import path from 'path';
 import { slugify } from '@/lib/utils';
+import type { Metadata } from 'next';
+
+// This function tells Next.js which movie pages to build
+export async function generateStaticParams() {
+  const filePath = path.join(process.cwd(), 'public/movies.json');
+  const file = await fs.readFile(filePath, 'utf-8');
+  const movies: Movie[] = JSON.parse(file);
+
+  return movies.map((movie) => ({
+    slug: slugify(movie.title),
+  }));
+}
 
 async function getMovieData(slug: string): Promise<Movie | null> {
     try {
-        const [moviesRes, personsRes, productionsRes] = await Promise.all([
-            fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/movies.json`),
-            fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/persons.json`),
-            fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/production.json`),
+        const movieFilePath = path.join(process.cwd(), 'public/movies.json');
+        const personFilePath = path.join(process.cwd(), 'public/persons.json');
+        const productionFilePath = path.join(process.cwd(), 'public/production.json');
+        
+        const [moviesFile, personsFile, productionsFile] = await Promise.all([
+            fs.readFile(movieFilePath, 'utf-8'),
+            fs.readFile(personFilePath, 'utf-8'),
+            fs.readFile(productionFilePath, 'utf-8'),
         ]);
 
-        if (!moviesRes.ok || !personsRes.ok || !productionsRes.ok) {
-            console.error('Failed to fetch movie data');
-            return null;
-        }
-
-        const movies: Movie[] = await moviesRes.json();
-        const persons: Person[] = await personsRes.json();
-        const productions: ProductionCompany[] = await productionsRes.json();
+        const movies: Movie[] = JSON.parse(moviesFile);
+        const persons: Person[] = JSON.parse(personsFile);
+        const productions: ProductionCompany[] = JSON.parse(productionsFile);
         
         const movie = movies.find((m) => slugify(m.title) === slug);
 
@@ -51,48 +60,36 @@ async function getMovieData(slug: string): Promise<Movie | null> {
     }
 }
 
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const movie = await getMovieData(params.slug);
 
-export default function MovieDetailPage({ params }: { params: { slug: string }}) {
-  const [movie, setMovie] = useState<Movie | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadData() {
-        const movieData = await getMovieData(params.slug);
-        if (movieData) {
-            setMovie(movieData);
-            document.title = `${movieData.title} | TimesEntertain`;
-        }
-        setIsLoading(false);
-    }
-    loadData();
-  }, [params.slug]);
-
-
-  if (isLoading) {
-    return (
-        <article className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-8">
-                <div className="md:col-span-1">
-                    <Skeleton className="w-full h-[500px] rounded-lg" />
-                </div>
-                <div className="md:col-span-2 space-y-4">
-                    <Skeleton className="h-10 w-3/4" />
-                    <Skeleton className="h-6 w-1/2" />
-                    <Skeleton className="h-8 w-1/4" />
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-12 w-48" />
-                </div>
-            </div>
-             <div className="mt-12">
-                <Skeleton className="h-8 w-32 mb-4" />
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {Array.from({length: 4}).map((_,i) => <Skeleton key={i} className="h-20 w-full" />)}
-                </div>
-            </div>
-        </article>
-    );
+  if (!movie) {
+    return {
+      title: 'Movie Not Found',
+    };
   }
+
+  return {
+    title: movie.title,
+    description: movie.overview,
+    openGraph: {
+      title: movie.title,
+      description: movie.overview,
+      images: [
+        {
+          url: movie.poster_url,
+          width: 400,
+          height: 600,
+          alt: `Poster for ${movie.title}`,
+        },
+      ],
+    },
+  };
+}
+
+
+export default async function MovieDetailPage({ params }: { params: { slug: string }}) {
+  const movie = await getMovieData(params.slug);
 
   if (!movie) {
     notFound();
