@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "The Silver Screen Specter",
+    "slug": "the-silver-screen-specter",
+    "year": 2023,
+    "rating": 8.5,
+    "genre": ["Mystery", "Thriller"],
+    "synopsis": "A detective investigates a series of strange occurrences at a vintage movie palace, only to uncover a ghost story that hits too close to home.",
+    "posterUrl": "https://placehold.co/400x600.png",
+    "trailerUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "castIds": [1, 2],
+    "directorId": 3,
+    "productionCompanyIds": [1]
+  },
+  {
+    "id": 2,
+    "title": "Echoes of Andromeda",
+    "slug": "echoes-of-andromeda",
+    "year": 2024,
+    "rating": 9.2,
+    "genre": ["Sci-Fi", "Adventure"],
+    "synopsis": "A lone astronaut on a mission to the Andromeda galaxy discovers a signal that could be the key to humanity's survival, or its ultimate doom.",
+    "posterUrl": "https://placehold.co/400x600.png",
+    "trailerUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "castIds": [4, 5],
+    "directorId": 6,
+    "productionCompanyIds": [2]
+  },
+  {
+    "id": 3,
+    "title": "The Last Alchemist",
+    "slug": "the-last-alchemist",
+    "year": 2022,
+    "rating": 7.8,
+    "genre": ["Fantasy", "Drama"],
+    "synopsis": "In a world where magic is fading, the last living alchemist embarks on a quest to restore the balance before a permanent darkness falls.",
+    "posterUrl": "https://placehold.co/400x600.png",
+    "trailerUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "castIds": [7, 8],
+    "directorId": 9,
+    "productionCompanyIds": [1, 3]
+  }
+]

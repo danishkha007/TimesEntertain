@@ -17,6 +17,21 @@ export default function AddToWatchlistButton({ item, type }: AddToWatchlistButto
   const isBookmarked = isInWatchlist(item.id, type);
 
   const handleToggleWatchlist = () => {
+    const watchlistMovieItem: Movie = {
+        id: item.id,
+        title: item.title,
+        slug: item.slug,
+        year: item.year,
+        rating: item.rating,
+        genre: item.genre,
+        synopsis: item.synopsis,
+        posterUrl: item.posterUrl,
+        trailerUrl: item.trailerUrl,
+        castIds: (item as Movie).castIds,
+        directorId: (item as Movie).directorId,
+        productionCompanyIds: (item as Movie).productionCompanyIds
+    }
+    
     if (isBookmarked) {
       removeFromWatchlist(item.id, type);
       toast({
@@ -24,7 +39,8 @@ export default function AddToWatchlistButton({ item, type }: AddToWatchlistButto
         description: `${item.title} has been removed from your watchlist.`,
       });
     } else {
-      addToWatchlist(item, type);
+      const itemToAdd = type === 'movies' ? watchlistMovieItem : item;
+      addToWatchlist(itemToAdd, type);
       toast({
         title: "Added to Watchlist",
         description: `${item.title} has been added to your watchlist.`,

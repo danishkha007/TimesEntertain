@@ -2,13 +2,17 @@
 
 import { useSearchParams } from 'next/navigation';
 import { ContentGrid } from "@/components/ContentGrid";
-import { movies, tvShows } from "@/lib/data";
+import { tvShows } from "@/lib/data";
 import { useEffect, useState } from 'react';
+import type { Movie, Person } from '@/lib/types';
 
 export default function SearchResults() {
   const searchParams = useSearchParams();
   const q = searchParams.get('q');
   const [query, setQuery] = useState(q || '');
+
+  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
+  const [filteredTvShows, setFilteredTvShows] = useState<any[]>([]);
 
   useEffect(() => {
     setQuery(q || '');
@@ -19,10 +23,51 @@ export default function SearchResults() {
     }
   }, [q]);
   
+  useEffect(() => {
+    async function fetchAndFilter() {
+      if (!query) {
+        setFilteredMovies([]);
+        setFilteredTvShows([]);
+        return;
+      }
+      
+      const lowercaseQuery = query.toLowerCase();
 
-  const lowercaseQuery = query.toLowerCase();
+      // Fetch movies and people
+      const [moviesRes, personsRes] = await Promise.all([
+        fetch('/TimesEntertain/movies.json'),
+        fetch('/TimesEntertain/persons.json')
+      ]);
+      const movies: Movie[] = await moviesRes.json();
+      const persons: Person[] = await personsRes.json();
+      
+      const personIdsMatchingQuery = persons
+        .filter(p => p.name.toLowerCase().includes(lowercaseQuery))
+        .map(p => p.id);
 
-  if (!lowercaseQuery) {
+      const moviesResult = movies.filter(
+        (movie) =>
+          movie.title.toLowerCase().includes(lowercaseQuery) ||
+          movie.castIds.some(id => personIdsMatchingQuery.includes(id)) ||
+          personIdsMatchingQuery.includes(movie.directorId)
+      );
+      setFilteredMovies(moviesResult);
+
+      const tvShowsResult = tvShows.filter(
+        (show) =>
+          show.title.toLowerCase().includes(lowercaseQuery) ||
+          show.cast.some((c) => c.name.toLowerCase().includes(lowercaseQuery))
+      );
+      setFilteredTvShows(tvShowsResult);
+    }
+
+    fetchAndFilter();
+
+  }, [query]);
+
+  const hasResults = filteredMovies.length > 0 || filteredTvShows.length > 0;
+
+  if (!query) {
     return (
       <div>
         <h1 className="text-3xl font-headline font-bold mb-8">Search</h1>
@@ -30,20 +75,6 @@ export default function SearchResults() {
       </div>
     );
   }
-
-  const filteredMovies = movies.filter(
-    (movie) =>
-      movie.title.toLowerCase().includes(lowercaseQuery) ||
-      movie.cast.some((c) => c.name.toLowerCase().includes(lowercaseQuery))
-  );
-
-  const filteredTvShows = tvShows.filter(
-    (show) =>
-      show.title.toLowerCase().includes(lowercaseQuery) ||
-      show.cast.some((c) => c.name.toLowerCase().includes(lowercaseQuery))
-  );
-
-  const hasResults = filteredMovies.length > 0 || filteredTvShows.length > 0;
 
   return (
     <div>
