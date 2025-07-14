@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Clapperboard, Search as SearchIcon } from "lucide-react";
+import { Search as SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { FormEvent } from "react";
+import { Logo } from "@/components/Logo";
 
 const navLinks = [
   { href: "/movies", label: "Movies" },
@@ -32,7 +33,7 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <Clapperboard className="h-8 w-8 text-primary" />
+            <Logo />
             <span className="text-xl font-headline font-bold">
               TimesEntertain
             </span>

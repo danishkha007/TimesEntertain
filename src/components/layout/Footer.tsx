@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clapperboard } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -9,7 +9,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
-            <Clapperboard className="h-6 w-6 text-muted-foreground" />
+            <Logo className="h-6 w-6 text-muted-foreground" />
             <span className="text-md font-headline font-semibold">
               TimesEntertain
             </span>
