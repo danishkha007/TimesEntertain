@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
@@ -197,7 +198,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             <h1 className="text-4xl font-headline font-bold mb-2">{movie.title} ({getYear(movie.release_date)})</h1>
             {movie.director && (
               <div className="flex items-center gap-4 mb-4 text-muted-foreground">
-                <span>Directed by {movie.director.name}</span>
+                <span>Directed by <Link href={`/person/${slugify(movie.director.name)}`} className="text-primary hover:underline">{movie.director.name}</Link></span>
               </div>
             )}
 
@@ -229,14 +230,28 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             {movie.writers && movie.writers.length > 0 && (
                 <div className="mt-6">
                     <h3 className="text-md font-semibold text-muted-foreground">Writers</h3>
-                    <p className="text-sm">{movie.writers.map(w => w.name).join(', ')}</p>
+                    <div className="text-sm">
+                        {movie.writers.map((writer, index) => (
+                            <span key={writer.id}>
+                                <Link href={`/person/${slugify(writer.name)}`} className="text-primary hover:underline">{writer.name}</Link>
+                                {index < movie.writers!.length - 1 ? ', ' : ''}
+                            </span>
+                        ))}
+                    </div>
                 </div>
             )}
 
             {movie.composers && movie.composers.length > 0 && (
                 <div className="mt-6">
                     <h3 className="text-md font-semibold text-muted-foreground">Music by</h3>
-                    <p className="text-sm">{movie.composers.map(c => c.name).join(', ')}</p>
+                     <div className="text-sm">
+                        {movie.composers.map((composer, index) => (
+                            <span key={composer.id}>
+                                <Link href={`/person/${slugify(composer.name)}`} className="text-primary hover:underline">{composer.name}</Link>
+                                {index < movie.composers!.length - 1 ? ', ' : ''}
+                            </span>
+                        ))}
+                    </div>
                 </div>
             )}
           </div>
