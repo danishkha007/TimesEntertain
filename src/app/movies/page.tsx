@@ -1,47 +1,30 @@
-"use client";
-
 import { ContentGrid } from '@/components/ContentGrid';
-import { Skeleton } from '@/components/ui/skeleton';
 import type { Movie } from '@/lib/types';
-import { useEffect, useState } from 'react';
+import { promises as fs } from 'fs';
+import path from 'path';
 
-export default function MoviesPage() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+async function getAllMovies(): Promise<Movie[]> {
+  try {
+    const filePath = path.join(process.cwd(), 'public/data/movies.json');
+    const file = await fs.readFile(filePath, 'utf-8');
+    const moviesData: Movie[] = JSON.parse(file);
+    return moviesData;
+  } catch (error) {
+    console.error("Failed to load movies:", error);
+    return [];
+  }
+}
 
-  useEffect(() => {
-    async function fetchMovies() {
-      try {
-        const res = await fetch('/data/movies.json');
-        if (!res.ok) {
-          throw new Error('Failed to fetch movies');
-        }
-        const moviesData: Movie[] = await res.json();
-        setMovies(moviesData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchMovies();
-  }, []);
+export default async function MoviesPage() {
+  const movies = await getAllMovies();
 
   return (
     <div>
       <h1 className="text-3xl font-headline font-bold mb-8">All Movies</h1>
-      {isLoading ? (
-         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-          {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="space-y-2">
-                  <Skeleton className="h-[350px] w-full" />
-                  <Skeleton className="h-4 w-[200px]" />
-                  <Skeleton className="h-4 w-[150px]" />
-              </div>
-          ))}
-        </div>
-      ) : (
+      {movies.length > 0 ? (
         <ContentGrid items={movies} type="movies" />
+      ) : (
+        <p>No movies could be loaded at this time.</p>
       )}
     </div>
   );

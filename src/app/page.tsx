@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Carousel,
   CarouselContent,
@@ -10,42 +8,24 @@ import {
 import { tvShows } from '@/lib/data';
 import type { Movie } from '@/lib/types';
 import { ContentCard } from '@/components/ContentCard';
-import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { promises as fs } from 'fs';
+import path from 'path';
 
-function MovieCarousel() {
-  const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+async function getPopularMovies(): Promise<Movie[]> {
+  try {
+    const filePath = path.join(process.cwd(), 'public/data/movies.json');
+    const file = await fs.readFile(filePath, 'utf-8');
+    const movies: Movie[] = JSON.parse(file);
+    return [...movies].sort((a, b) => (b.imdb_rating ?? 0) - (a.imdb_rating ?? 0)).slice(0, 10);
+  } catch (error) {
+    console.error("Failed to fetch and process movies:", error);
+    return [];
+  }
+}
 
-  useEffect(() => {
-    async function fetchMovies() {
-      try {
-        const res = await fetch('/data/movies.json');
-        if (!res.ok) {
-          throw new Error('Failed to fetch movies');
-        }
-        const movies: Movie[] = await res.json();
-        const sortedMovies = [...movies].sort((a, b) => (b.imdb_rating ?? 0) - (a.imdb_rating ?? 0)).slice(0, 10);
-        setPopularMovies(sortedMovies);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchMovies();
-  }, []);
-  
-  if (isLoading) {
-    return (
-       <div className="flex space-x-4">
-        {Array.from({ length: 5 }).map((_, i) => (
-           <div key={i} className="min-w-0 shrink-0 grow-0 basis-1/2 md:basis-1/3 lg:basis-1/5 pl-4">
-             <Skeleton className="h-[350px] w-full" />
-           </div>
-        ))}
-      </div>
-    )
+function MovieCarousel({ popularMovies }: { popularMovies: Movie[] }) {
+  if (!popularMovies || popularMovies.length === 0) {
+    return <p>Could not load popular movies.</p>;
   }
 
   return (
@@ -73,7 +53,8 @@ function MovieCarousel() {
 }
 
 
-export default function Home() {
+export default async function Home() {
+  const popularMovies = await getPopularMovies();
   const popularTvShows = [...tvShows].sort((a, b) => b.rating - a.rating).slice(0, 10);
 
   return (
@@ -92,7 +73,7 @@ export default function Home() {
         <h2 className="text-2xl font-headline font-bold mb-4">
           Popular Movies
         </h2>
-        <MovieCarousel />
+        <MovieCarousel popularMovies={popularMovies} />
       </section>
 
       <section>
