@@ -13,7 +13,7 @@ import path from 'path';
 
 async function getPopularMovies(): Promise<Movie[]> {
   try {
-    const filePath = path.join(process.cwd(), 'public/data/movies.json');
+    const filePath = path.join(process.cwd(), 'public/movies.json');
     const file = await fs.readFile(filePath, 'utf-8');
     const movies: Movie[] = JSON.parse(file);
     return [...movies].sort((a, b) => (b.imdb_rating ?? 0) - (a.imdb_rating ?? 0)).slice(0, 10);

@@ -5,7 +5,7 @@ import path from 'path';
 
 async function getAllMovies(): Promise<Movie[]> {
   try {
-    const filePath = path.join(process.cwd(), 'public/data/movies.json');
+    const filePath = path.join(process.cwd(), 'public/movies.json');
     const file = await fs.readFile(filePath, 'utf-8');
     const moviesData: Movie[] = JSON.parse(file);
     return moviesData;

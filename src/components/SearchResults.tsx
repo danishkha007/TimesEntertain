@@ -35,8 +35,8 @@ export default function SearchResults() {
 
       // Fetch movies and people
       const [moviesRes, personsRes] = await Promise.all([
-        fetch('/data/movies.json'),
-        fetch('/data/persons.json')
+        fetch('/movies.json'),
+        fetch('/persons.json')
       ]);
       const movies: Movie[] = await moviesRes.json();
       const persons: Person[] = await personsRes.json();
