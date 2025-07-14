@@ -86,7 +86,7 @@ export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
           )}
         </div>
         <div className="lg:col-span-1">
-          <ScrollArea className="h-[27rem] pr-4 border rounded-lg">
+          <ScrollArea className="h-[27rem] border rounded-lg">
             <div className="flex flex-col">
               {videos.map((video, index) => {
                 const thumbnailUrl = getThumbnailUrl(video);
