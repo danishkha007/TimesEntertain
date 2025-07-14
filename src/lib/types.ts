@@ -1,7 +1,20 @@
+export interface Role {
+  movie_id: number;
+  character: string;
+}
+
+export interface CrewRole {
+  movie_id: number;
+  job: string;
+  department: string;
+}
+
 export interface Person {
   id: number;
   name: string;
-  role: string;
+  profile_url?: string | null;
+  roles?: Role[];
+  crew_roles?: CrewRole[];
 }
 
 export interface ProductionCompany {
@@ -24,7 +37,7 @@ export interface Video {
 export interface ContentItem {
   id: number;
   title: string;
-  slug?: string; // Movie slug is generated on the fly
+  slug?: string;
 }
 
 export interface Movie extends ContentItem {
@@ -53,7 +66,7 @@ export interface TVShow extends ContentItem {
   synopsis: string;
   posterUrl: string;
   trailerUrl: string;
-  slug: string; // TVShow slug is pre-defined
+  slug: string;
   cast: { name: string; role: string }[];
   director: string;
 }

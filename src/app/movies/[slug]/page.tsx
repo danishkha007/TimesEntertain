@@ -33,9 +33,14 @@ async function getMovieData(slug: string): Promise<Movie | null> {
             return null;
         }
 
-        // Find the director from crew
-        const director = persons.find(p => movie.crew_ids.includes(p.id) && p.role === 'Director');
-        const cast = movie.cast_ids.map(id => persons.find(p => p.id === id)).filter(Boolean) as Person[];
+        const director = persons.find(p => 
+            p.crew_roles?.some(role => role.movie_id === movie.id && role.job === 'Director')
+        );
+
+        const cast = movie.cast_ids
+            .map(id => persons.find(p => p.id === id))
+            .filter(Boolean) as Person[];
+        
         const production = movie.production_company_ids.map(id => productions.find(p => p.id === id)).filter(Boolean) as ProductionCompany[];
         
         return { ...movie, director, cast, production };

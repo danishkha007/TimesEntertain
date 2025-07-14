@@ -1,9 +1,79 @@
 [
-  { "id": 934, "name": "Russell Crowe", "role": "Actor" },
-  { "id": 73421, "name": "Joaquin Phoenix", "role": "Actor" },
-  { "id": 935, "name": "Connie Nielsen", "role": "Actor" },
-  { "id": 936, "name": "Oliver Reed", "role": "Actor" },
-  { "id": 578, "name": "Ridley Scott", "role": "Director" },
-  { "id": 944, "name": "Hans Zimmer", "role": "Composer" },
-  { "id": 945, "name": "John Mathieson", "role": "Director of Photography" }
+  {
+    "id": 578,
+    "name": "Ridley Scott",
+    "profile_url": "https://image.tmdb.org/t/p/w300/c0oXzzI4i5f5fMic9o2vR0IuL4.jpg",
+    "roles": [],
+    "crew_roles": [
+      {
+        "movie_id": 98,
+        "job": "Director",
+        "department": "Directing"
+      },
+      {
+        "movie_id": 3,
+        "job": "Producer",
+        "department": "Production"
+      }
+    ]
+  },
+  {
+    "id": 934,
+    "name": "Russell Crowe",
+    "profile_url": "https://image.tmdb.org/t/p/w300/iLMGhpbCwE68I22l1wB22yI3aie.jpg",
+    "roles": [
+      {
+        "movie_id": 98,
+        "character": "Maximus Decimus Meridius"
+      }
+    ],
+    "crew_roles": []
+  },
+  {
+    "id": 73421,
+    "name": "Joaquin Phoenix",
+    "profile_url": "https://image.tmdb.org/t/p/w300/nXM2G5T49aJ0O3eDchBttA3s6DE.jpg",
+    "roles": [
+      {
+        "movie_id": 98,
+        "character": "Commodus"
+      }
+    ],
+    "crew_roles": []
+  },
+  {
+    "id": 194,
+    "name": "Connie Nielsen",
+    "profile_url": "https://image.tmdb.org/t/p/w300/u332m2a22r33iPj1s4H3umxI2aN.jpg",
+    "roles": [
+      {
+        "movie_id": 98,
+        "character": "Lucilla"
+      }
+    ],
+    "crew_roles": []
+  },
+  {
+    "id": 110756,
+    "name": "Juuso Hirvikangas",
+    "profile_url": "https://image.tmdb.org/t/p/w300/7rvAPTsfz9U2E5tYghfY8YQlZ94.jpg",
+    "roles": [
+      {
+        "movie_id": 2,
+        "character": "Man in Harbour (uncredited)"
+      }
+    ],
+    "crew_roles": [
+      {
+        "movie_id": 2,
+        "job": "Gaffer",
+        "department": "Lighting"
+      },
+      {
+        "movie_id": 3,
+        "job": "Sound Assistant",
+        "department": "Sound"
+      }
+    ]
+  }
 ]
