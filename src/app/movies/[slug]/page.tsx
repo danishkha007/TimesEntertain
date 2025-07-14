@@ -109,6 +109,19 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 
+const getEmbedUrl = (video: Video) => {
+    if (!video || !video.key) return null;
+    if (video.site === 'YouTube') {
+        return `https://www.youtube.com/embed/${video.key}`;
+    }
+    // Attempt to parse other video URLs, might need more robust logic
+    if (video.url && video.url.includes('youtube.com/watch?v=')) {
+        const key = video.url.split('v=')[1];
+        return `https://www.youtube.com/embed/${key}`;
+    }
+    return video.url; // Fallback
+};
+
 export default async function MovieDetailPage({ params }: { params: { slug: string }}) {
   const movie = await getMovieData(params.slug);
 
@@ -117,17 +130,6 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
   }
   
   const getYear = (dateString: string) => new Date(dateString).getFullYear();
-
-  const officialTrailer = movie.videos?.find(v => v.type === 'Trailer' && v.official);
-  const trailer = officialTrailer || movie.videos?.find(v => v.type === 'Trailer');
-  const getEmbedUrl = (video: Video | undefined) => {
-    if (!video || !video.key) return undefined;
-    if (video.site === 'YouTube') {
-      return `https://www.youtube.com/embed/${video.key}`;
-    }
-    return video.url;
-  };
-  const embeddableTrailerUrl = getEmbedUrl(trailer);
 
   const topCast = movie.cast?.slice(0, 10) || [];
 
@@ -234,18 +236,31 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
           </div>
         )}
 
-        {embeddableTrailerUrl && (
+        {movie.videos && movie.videos.length > 0 && (
           <div className="mt-12">
-              <h2 className="text-2xl font-headline font-bold mb-4">Trailer</h2>
-              <div className="aspect-video">
-                  <iframe 
-                      src={embeddableTrailerUrl}
-                      title={`Trailer for ${movie.title}`}
-                      className="w-full h-full rounded-lg"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                  ></iframe>
-              </div>
+            <h2 className="text-2xl font-headline font-bold mb-6">Videos Related to {movie.title}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {movie.videos.map((video) => {
+                const embedUrl = getEmbedUrl(video);
+                if (!embedUrl) return null;
+                
+                return (
+                  <div key={video.key || video.url}>
+                    <div className="aspect-video mb-2">
+                      <iframe
+                        src={embedUrl}
+                        title={video.name}
+                        className="w-full h-full rounded-lg"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      ></iframe>
+                    </div>
+                    <h3 className="font-semibold">{video.name}</h3>
+                    <p className="text-sm text-muted-foreground">{video.type}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </article>
