@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/carousel';
 import { CastMemberCard } from '@/components/CastMemberCard';
 import { FullCastDialog } from '@/components/FullCastDialog';
+import { VideoPlayer } from '@/components/VideoPlayer';
 
 export async function generateStaticParams() {
   try {
@@ -237,31 +238,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
         )}
 
         {movie.videos && movie.videos.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-headline font-bold mb-6">Videos Related to {movie.title}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {movie.videos.map((video) => {
-                const embedUrl = getEmbedUrl(video);
-                if (!embedUrl) return null;
-                
-                return (
-                  <div key={video.key || video.url}>
-                    <div className="aspect-video mb-2">
-                      <iframe
-                        src={embedUrl}
-                        title={video.name}
-                        className="w-full h-full rounded-lg"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                    <h3 className="font-semibold">{video.name}</h3>
-                    <p className="text-sm text-muted-foreground">{video.type}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <VideoPlayer videos={movie.videos} movieTitle={movie.title} />
         )}
       </article>
     </>
