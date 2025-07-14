@@ -1,7 +1,7 @@
 "use client";
 
 import type { Video } from '@/lib/types';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { PlayCircle } from 'lucide-react';
@@ -35,6 +35,7 @@ const getThumbnailUrl = (video: Video) => {
 export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
   // Prioritize trailers, then clips, then the first video
   const initialVideo = useMemo(() => {
+    if (!videos || videos.length === 0) return null;
     return (
       videos.find((v) => v.type === 'Trailer') ||
       videos.find((v) => v.type === 'Clip') ||
@@ -42,7 +43,15 @@ export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
     );
   }, [videos]);
 
-  const [selectedVideo, setSelectedVideo] = useState<Video>(initialVideo);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(initialVideo);
+  
+  useEffect(() => {
+    setSelectedVideo(initialVideo);
+  }, [initialVideo]);
+
+  if (!selectedVideo) {
+    return null;
+  }
 
   const selectedEmbedUrl = getEmbedUrl(selectedVideo);
 
@@ -86,7 +95,7 @@ export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
                     onClick={() => setSelectedVideo(video)}
                     className={cn(
                         "flex items-center gap-4 p-3 text-left transition-colors w-full",
-                        selectedVideo.key === video.key ? "bg-accent" : "hover:bg-accent/50",
+                        selectedVideo?.key === video.key ? "bg-accent" : "hover:bg-accent/50",
                         index !== 0 && "border-t"
                     )}
                     >
