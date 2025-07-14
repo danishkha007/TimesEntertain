@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useWatchlist } from '@/hooks/use-watchlist';
@@ -25,15 +26,7 @@ export default function AddToWatchlistButton({ item, type }: AddToWatchlistButto
         description: `${item.title} has been removed from your watchlist.`,
       });
     } else {
-      let itemToAdd: Movie | TVShow;
-      if (type === 'movies') {
-        const movieItem = item as Movie;
-        // Ensure all properties, including watch_providers, are carried over.
-        itemToAdd = { ...movieItem };
-      } else {
-        itemToAdd = item;
-      }
-      addToWatchlist(itemToAdd, type);
+      addToWatchlist(item, type);
       toast({
         title: "Added to Watchlist",
         description: `${item.title} has been added to your watchlist.`,
