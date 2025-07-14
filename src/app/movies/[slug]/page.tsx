@@ -3,13 +3,21 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
-import type { Movie, Person, ProductionCompany, Video } from '@/lib/types';
+import type { Movie, Person, ProductionCompany, Video, Role } from '@/lib/types';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { slugify } from '@/lib/utils';
 import type { Metadata } from 'next';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { CastMemberCard } from '@/components/CastMemberCard';
+import { FullCastDialog } from '@/components/FullCastDialog';
 
-// This function tells Next.js which movie pages to build
 export async function generateStaticParams() {
   try {
     const filePath = path.join(process.cwd(), 'public/movies.json');
@@ -52,8 +60,14 @@ async function getMovieData(slug: string): Promise<Movie | null> {
         );
 
         const cast = movie.cast_ids
-            .map(id => persons.find(p => p.id === id))
-            .filter(Boolean) as Person[];
+            .map(id => {
+                const person = persons.find(p => p.id === id);
+                if (!person) return null;
+
+                const role = person.roles?.find(r => r.movie_id === movie.id);
+                return { ...person, character: role?.character };
+            })
+            .filter(Boolean) as (Person & { character?: string })[];
         
         const production = movie.production_company_ids.map(id => productions.find(p => p.id === id)).filter(Boolean) as ProductionCompany[];
         
@@ -105,19 +119,17 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
   const getYear = (dateString: string) => new Date(dateString).getFullYear();
 
   const officialTrailer = movie.videos?.find(v => v.type === 'Trailer' && v.official);
-  // Fallback to any trailer if no official one is found
   const trailer = officialTrailer || movie.videos?.find(v => v.type === 'Trailer');
-  // Convert trailer URL to embeddable format
   const getEmbedUrl = (video: Video | undefined) => {
     if (!video || !video.key) return undefined;
     if (video.site === 'YouTube') {
       return `https://www.youtube.com/embed/${video.key}`;
     }
-    // Handle other video sites if necessary
     return video.url;
   };
   const embeddableTrailerUrl = getEmbedUrl(trailer);
 
+  const topCast = movie.cast?.slice(0, 10) || [];
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -154,7 +166,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article className="max-w-4xl mx-auto">
+      <article className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
             <Image
@@ -204,14 +216,21 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
 
         {movie.cast && movie.cast.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-2xl font-headline font-bold mb-4">Cast</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {movie.cast.map(c => (
-                <div key={c.id} className="bg-muted/50 p-3 rounded-lg">
-                  <p className="font-semibold">{c.name}</p>
-                </div>
-              ))}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-headline font-bold">Cast</h2>
+              <FullCastDialog cast={movie.cast} movieTitle={movie.title} />
             </div>
+            <Carousel opts={{ align: 'start' }} className="w-full">
+              <CarouselContent>
+                {topCast.map(c => (
+                  <CarouselItem key={c.id} className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
+                     <CastMemberCard actor={c} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="ml-12" />
+              <CarouselNext className="mr-12" />
+            </Carousel>
           </div>
         )}
 

@@ -15,6 +15,7 @@ export interface Person {
   profile_url?: string | null;
   roles?: Role[];
   crew_roles?: CrewRole[];
+  character?: string; // Added for convenience after joining
 }
 
 export interface ProductionCompany {
@@ -53,7 +54,7 @@ export interface Movie extends ContentItem {
   videos?: Video[];
 
   // Populated fields
-  cast?: Person[];
+  cast?: (Person & { character?: string })[];
   director?: Person;
   production?: ProductionCompany[];
 }
