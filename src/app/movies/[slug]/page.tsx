@@ -224,7 +224,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
 
             <AddToWatchlistButton item={movie} type="movies" />
 
-            {movie.watch_providers && <WatchProviders providers={movie.watch_providers} />}
+            <WatchProviders providers={movie.watch_providers || []} />
 
             {movie.production && movie.production.length > 0 && (
                 <div className="mt-6">
