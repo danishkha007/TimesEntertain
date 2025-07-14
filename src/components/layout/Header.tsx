@@ -11,7 +11,6 @@ import type { FormEvent } from "react";
 const navLinks = [
   { href: "/movies", label: "Movies" },
   { href: "/tv", label: "TV Shows" },
-  { href: "/recommendations", label: "Recommendations" },
   { href: "/watchlist", label: "My Watchlist" },
 ];
 
