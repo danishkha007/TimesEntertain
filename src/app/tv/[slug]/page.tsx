@@ -24,6 +24,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: 'TV Show Not Found',
     };
   }
+  
+  const imageUrl = show.posterUrl || 'https://placehold.co/400x600.png';
 
   return {
     title: show.title,
@@ -33,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: show.synopsis,
       images: [
         {
-          url: show.posterUrl,
+          url: imageUrl,
           width: 400,
           height: 600,
           alt: `Poster for ${show.title}`,
@@ -74,6 +76,8 @@ export default function TvShowDetailPage({ params }: Props) {
     },
   };
 
+  const posterUrl = show.posterUrl || "https://placehold.co/400x600.png";
+
   return (
     <>
       <script
@@ -84,7 +88,7 @@ export default function TvShowDetailPage({ params }: Props) {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
             <Image
-              src={show.posterUrl}
+              src={posterUrl}
               alt={`Poster for ${show.title}`}
               width={400}
               height={600}

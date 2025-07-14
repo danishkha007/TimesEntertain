@@ -11,13 +11,18 @@ import type { Metadata } from 'next';
 
 // This function tells Next.js which movie pages to build
 export async function generateStaticParams() {
-  const filePath = path.join(process.cwd(), 'public/movies.json');
-  const file = await fs.readFile(filePath, 'utf-8');
-  const movies: Movie[] = JSON.parse(file);
+  try {
+    const filePath = path.join(process.cwd(), 'public/movies.json');
+    const file = await fs.readFile(filePath, 'utf-8');
+    const movies: Movie[] = JSON.parse(file);
 
-  return movies.map((movie) => ({
-    slug: slugify(movie.title),
-  }));
+    return movies.map((movie) => ({
+      slug: slugify(movie.title),
+    }));
+  } catch (error) {
+    console.error('Error generating static params for movies:', error);
+    return [];
+  }
 }
 
 async function getMovieData(slug: string): Promise<Movie | null> {
@@ -69,6 +74,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
   }
 
+  const imageUrl = movie.poster_url || 'https://placehold.co/400x600.png';
+
   return {
     title: movie.title,
     description: movie.overview,
@@ -77,7 +84,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       description: movie.overview,
       images: [
         {
-          url: movie.poster_url,
+          url: imageUrl,
           width: 400,
           height: 600,
           alt: `Poster for ${movie.title}`,
@@ -131,13 +138,15 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
       '@type': 'Organization',
       name: p.name,
     })),
-    aggregateRating: {
+    aggregateRating: movie.imdb_rating ? {
       '@type': 'AggregateRating',
       ratingValue: movie.imdb_rating?.toString(),
       bestRating: '10',
       ratingCount: movie.vote_count.toString(), 
-    },
+    } : undefined,
   };
+  
+  const posterUrl = movie.poster_url || "https://placehold.co/400x600.png";
 
   return (
     <>
@@ -149,7 +158,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
             <Image
-              src={movie.poster_url}
+              src={posterUrl}
               alt={`Poster for ${movie.title}`}
               width={400}
               height={600}
@@ -167,10 +176,12 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             )}
 
             <div className="flex items-center gap-4 mb-6">
+            {movie.imdb_rating && (
               <div className="flex items-center gap-1 text-lg font-bold">
                 <Star className="w-5 h-5 text-yellow-400 fill-current" />
                 <span>{movie.imdb_rating?.toFixed(1)}</span>
               </div>
+            )}
               <div className="flex flex-wrap gap-2">
                 {movie.genres.map((g) => (
                   <Badge key={g} variant="secondary">{g}</Badge>

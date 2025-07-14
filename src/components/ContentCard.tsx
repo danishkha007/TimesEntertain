@@ -12,8 +12,13 @@ interface ContentCardProps {
 
 export function ContentCard({ item, type, className }: ContentCardProps) {
   const slug = item.slug ?? slugify(item.title);
-  const posterUrl = 'poster_url' in item ? item.poster_url : item.posterUrl;
-  const year = 'release_date' in item ? new Date(item.release_date).getFullYear() : item.year;
+  
+  let itemPosterUrl = 'poster_url' in item ? item.poster_url : item.posterUrl;
+  if (!itemPosterUrl) {
+    itemPosterUrl = 'https://placehold.co/400x600.png';
+  }
+  
+  const year = 'release_date' in item && item.release_date ? new Date(item.release_date).getFullYear() : ('year' in item ? item.year : '');
 
   return (
     <Link href={`/${type}/${slug}`} className="block group mt-4">
@@ -21,7 +26,7 @@ export function ContentCard({ item, type, className }: ContentCardProps) {
         <CardContent className="p-0">
           <div className="aspect-[2/3] relative">
             <Image
-              src={posterUrl}
+              src={itemPosterUrl}
               alt={`Poster for ${item.title}`}
               fill
               className="object-cover"
