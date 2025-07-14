@@ -50,18 +50,18 @@ export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
     setSelectedVideo(initialVideo);
   }, [initialVideo]);
 
-  if (!selectedVideo) {
+  if (!videos || videos.length === 0) {
     return null;
   }
-
-  const selectedEmbedUrl = getEmbedUrl(selectedVideo);
+  
+  const selectedEmbedUrl = selectedVideo ? getEmbedUrl(selectedVideo) : null;
 
   return (
     <div className="mt-12">
       <h2 className="text-2xl font-headline font-bold mb-6">Videos Related to {movieTitle}</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          {selectedEmbedUrl ? (
+          {selectedEmbedUrl && selectedVideo ? (
             <>
               <div className="aspect-video mb-2 bg-black rounded-lg">
                 <iframe
