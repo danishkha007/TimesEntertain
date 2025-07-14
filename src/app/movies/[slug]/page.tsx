@@ -1,3 +1,4 @@
+
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -85,7 +86,7 @@ async function getMovieData(slug: string): Promise<Movie | null> {
         
         const production = movie.production_company_ids.map(id => productions.find(p => p.id === id)).filter(Boolean) as ProductionCompany[];
         
-        return { ...movie, director, cast, writers, composers, production };
+        return { ...movie, director, cast, writers, composers, production, watch_providers: movie.watch_providers };
 
     } catch (error) {
         console.error('Error fetching movie data:', error);
