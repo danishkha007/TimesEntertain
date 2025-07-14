@@ -12,7 +12,7 @@ import type { Metadata } from 'next';
 // This function tells Next.js which movie pages to build
 export async function generateStaticParams() {
   try {
-    const filePath = path.join(process.cwd(), 'src/lib/data/movies.json');
+    const filePath = path.join(process.cwd(), 'public/data/movies.json');
     const file = await fs.readFile(filePath, 'utf-8');
     const movies: Movie[] = JSON.parse(file);
 
@@ -27,9 +27,9 @@ export async function generateStaticParams() {
 
 async function getMovieData(slug: string): Promise<Movie | null> {
     try {
-        const movieFilePath = path.join(process.cwd(), 'src/lib/data/movies.json');
-        const personFilePath = path.join(process.cwd(), 'src/lib/data/persons.json');
-        const productionFilePath = path.join(process.cwd(), 'src/lib/data/production.json');
+        const movieFilePath = path.join(process.cwd(), 'public/data/movies.json');
+        const personFilePath = path.join(process.cwd(), 'public/data/persons.json');
+        const productionFilePath = path.join(process.cwd(), 'public/data/production.json');
         
         const [moviesFile, personsFile, productionsFile] = await Promise.all([
             fs.readFile(movieFilePath, 'utf-8'),
