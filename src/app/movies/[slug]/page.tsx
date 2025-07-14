@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
-import type { Movie, Person, ProductionCompany, Video, Role } from '@/lib/types';
+import type { Movie, Person, ProductionCompany, Video } from '@/lib/types';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { slugify } from '@/lib/utils';
