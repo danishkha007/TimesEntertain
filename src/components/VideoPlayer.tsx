@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { PlayCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface VideoPlayerProps {
   videos: Video[];
@@ -54,7 +55,10 @@ export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
                   allowFullScreen
                 ></iframe>
               </div>
-              <h3 className="font-semibold text-lg">{selectedVideo.name}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-lg">{selectedVideo.name}</h3>
+                {selectedVideo.official && <Badge>Official</Badge>}
+              </div>
               <p className="text-sm text-muted-foreground">{selectedVideo.type}</p>
             </>
           ) : (
@@ -81,7 +85,10 @@ export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
                   </div>
                   <div className="flex-grow">
                     <h4 className="font-semibold text-sm leading-tight line-clamp-2">{video.name}</h4>
-                    <p className="text-xs text-muted-foreground">{video.type}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                        <p className="text-xs text-muted-foreground">{video.type}</p>
+                        {video.official && <Badge variant="secondary" className="px-1.5 py-0 text-xs">Official</Badge>}
+                    </div>
                   </div>
                 </button>
               ))}
