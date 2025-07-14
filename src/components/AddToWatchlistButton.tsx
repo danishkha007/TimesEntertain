@@ -28,20 +28,8 @@ export default function AddToWatchlistButton({ item, type }: AddToWatchlistButto
       let itemToAdd: Movie | TVShow;
       if (type === 'movies') {
         const movieItem = item as Movie;
-        itemToAdd = {
-          id: movieItem.id,
-          title: movieItem.title,
-          overview: movieItem.overview,
-          release_date: movieItem.release_date,
-          genres: movieItem.genres,
-          poster_url: movieItem.poster_url,
-          imdb_rating: movieItem.imdb_rating,
-          vote_count: movieItem.vote_count,
-          cast_ids: movieItem.cast_ids,
-          crew_ids: movieItem.crew_ids,
-          production_company_ids: movieItem.production_company_ids,
-          videos: movieItem.videos,
-        };
+        // Ensure all properties, including watch_providers, are carried over.
+        itemToAdd = { ...movieItem };
       } else {
         itemToAdd = item;
       }
