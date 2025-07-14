@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Toaster } from '@/components/ui/toaster';
-import { ScrollProgressBar } from '@/components/ScrollProgressBar';
 
 export const metadata: Metadata = {
   title: {
@@ -39,7 +38,6 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased flex flex-col'
         )}
       >
-        <ScrollProgressBar />
         <Header />
         <main className="flex-grow container mx-auto px-4 py-8">{children}</main>
         <Footer />
