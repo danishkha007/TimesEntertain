@@ -211,7 +211,9 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             )}
               <div className="flex flex-wrap gap-2">
                 {movie.genres.map((g) => (
-                  <Badge key={g} variant="secondary">{g}</Badge>
+                  <Link key={g} href={`/genre/${slugify(g)}`}>
+                    <Badge variant="secondary" className="hover:bg-accent transition-colors">{g}</Badge>
+                  </Link>
                 ))}
               </div>
             </div>
