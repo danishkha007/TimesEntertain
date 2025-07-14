@@ -1,25 +1,28 @@
+"use client";
+
+import { useSearchParams } from 'next/navigation';
 import { ContentGrid } from "@/components/ContentGrid";
 import { movies, tvShows } from "@/lib/data";
-import type { Metadata } from "next";
+import { useEffect, useState } from 'react';
 
-type SearchPageProps = {
-  searchParams: {
-    q?: string;
-  };
-};
+export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const q = searchParams.get('q');
+  const [query, setQuery] = useState(q || '');
 
-export function generateMetadata({ searchParams }: SearchPageProps): Metadata {
-    const query = searchParams.q || "";
-    return {
-        title: query ? `Search results for "${query}"` : "Search",
-        description: `Find movies and TV shows matching your search for ${query}.`
+  useEffect(() => {
+    setQuery(q || '');
+    if (q) {
+      document.title = `Search results for "${q}" | TimesEntertain`;
+    } else {
+      document.title = `Search | TimesEntertain`;
     }
-}
+  }, [q]);
+  
 
-export default function SearchPage({ searchParams }: SearchPageProps) {
-  const query = searchParams.q?.toLowerCase() || "";
+  const lowercaseQuery = query.toLowerCase();
 
-  if (!query) {
+  if (!lowercaseQuery) {
     return (
       <div>
         <h1 className="text-3xl font-headline font-bold mb-8">Search</h1>
@@ -30,14 +33,14 @@ export default function SearchPage({ searchParams }: SearchPageProps) {
 
   const filteredMovies = movies.filter(
     (movie) =>
-      movie.title.toLowerCase().includes(query) ||
-      movie.cast.some((c) => c.name.toLowerCase().includes(query))
+      movie.title.toLowerCase().includes(lowercaseQuery) ||
+      movie.cast.some((c) => c.name.toLowerCase().includes(lowercaseQuery))
   );
 
   const filteredTvShows = tvShows.filter(
     (show) =>
-      show.title.toLowerCase().includes(query) ||
-      show.cast.some((c) => c.name.toLowerCase().includes(query))
+      show.title.toLowerCase().includes(lowercaseQuery) ||
+      show.cast.some((c) => c.name.toLowerCase().includes(lowercaseQuery))
   );
 
   const hasResults = filteredMovies.length > 0 || filteredTvShows.length > 0;
@@ -45,7 +48,7 @@ export default function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div>
       <h1 className="text-3xl font-headline font-bold mb-8">
-        Search Results for &quot;{searchParams.q}&quot;
+        Search Results for &quot;{query}&quot;
       </h1>
 
       {!hasResults ? (
