@@ -3,7 +3,7 @@
 
 import type { Video } from '@/lib/types';
 import { useState, useMemo, useEffect } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { PlayCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -119,6 +119,7 @@ export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
                 )
               })}
             </div>
+          <ScrollBar />
           </ScrollArea>
         </div>
       </div>
