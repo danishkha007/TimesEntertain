@@ -5,9 +5,10 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
-import type { Movie, Person, ProductionCompany } from '@/lib/types';
+import type { Movie, Person, ProductionCompany, Video } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { slugify } from '@/lib/utils';
 
 async function getMovieData(slug: string): Promise<Movie | null> {
     try {
@@ -25,16 +26,17 @@ async function getMovieData(slug: string): Promise<Movie | null> {
         const movies: Movie[] = await moviesRes.json();
         const persons: Person[] = await personsRes.json();
         const productions: ProductionCompany[] = await productionsRes.json();
-
-        const movie = movies.find((m) => m.slug === slug);
+        
+        const movie = movies.find((m) => slugify(m.title) === slug);
 
         if (!movie) {
             return null;
         }
 
-        const director = persons.find(p => p.id === movie.directorId);
-        const cast = movie.castIds.map(id => persons.find(p => p.id === id)).filter(Boolean) as Person[];
-        const production = movie.productionCompanyIds.map(id => productions.find(p => p.id === id)).filter(Boolean) as ProductionCompany[];
+        // Find the director from crew
+        const director = persons.find(p => movie.crew_ids.includes(p.id) && p.role === 'Director');
+        const cast = movie.cast_ids.map(id => persons.find(p => p.id === id)).filter(Boolean) as Person[];
+        const production = movie.production_company_ids.map(id => productions.find(p => p.id === id)).filter(Boolean) as ProductionCompany[];
         
         return { ...movie, director, cast, production };
 
@@ -90,14 +92,31 @@ export default function MovieDetailPage({ params }: { params: { slug: string }})
   if (!movie) {
     notFound();
   }
+  
+  const getYear = (dateString: string) => new Date(dateString).getFullYear();
+
+  const officialTrailer = movie.videos?.find(v => v.type === 'Trailer' && v.official);
+  // Fallback to any trailer if no official one is found
+  const trailer = officialTrailer || movie.videos?.find(v => v.type === 'Trailer');
+  // Convert trailer URL to embeddable format
+  const getEmbedUrl = (video: Video | undefined) => {
+    if (!video || !video.key) return undefined;
+    if (video.site === 'YouTube') {
+      return `https://www.youtube.com/embed/${video.key}`;
+    }
+    // Handle other video sites if necessary
+    return video.url;
+  };
+  const embeddableTrailerUrl = getEmbedUrl(trailer);
+
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Movie',
     name: movie.title,
-    datePublished: movie.year.toString(),
-    image: movie.posterUrl,
-    description: movie.synopsis,
+    datePublished: movie.release_date,
+    image: movie.poster_url,
+    description: movie.overview,
     director: movie.director ? {
       '@type': 'Person',
       name: movie.director.name,
@@ -112,9 +131,9 @@ export default function MovieDetailPage({ params }: { params: { slug: string }})
     })),
     aggregateRating: {
       '@type': 'AggregateRating',
-      ratingValue: movie.rating.toString(),
+      ratingValue: movie.imdb_rating?.toString(),
       bestRating: '10',
-      ratingCount: '1', // Mock value
+      ratingCount: movie.vote_count.toString(), 
     },
   };
 
@@ -128,7 +147,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string }})
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
             <Image
-              src={movie.posterUrl}
+              src={movie.poster_url}
               alt={`Poster for ${movie.title}`}
               width={400}
               height={600}
@@ -138,7 +157,7 @@ export default function MovieDetailPage({ params }: { params: { slug: string }})
           </div>
 
           <div className="md:col-span-2">
-            <h1 className="text-4xl font-headline font-bold mb-2">{movie.title} ({movie.year})</h1>
+            <h1 className="text-4xl font-headline font-bold mb-2">{movie.title} ({getYear(movie.release_date)})</h1>
             {movie.director && (
               <div className="flex items-center gap-4 mb-4 text-muted-foreground">
                 <span>Directed by {movie.director.name}</span>
@@ -148,16 +167,16 @@ export default function MovieDetailPage({ params }: { params: { slug: string }})
             <div className="flex items-center gap-4 mb-6">
               <div className="flex items-center gap-1 text-lg font-bold">
                 <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                <span>{movie.rating.toFixed(1)}</span>
+                <span>{movie.imdb_rating?.toFixed(1)}</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {movie.genre.map((g) => (
+                {movie.genres.map((g) => (
                   <Badge key={g} variant="secondary">{g}</Badge>
                 ))}
               </div>
             </div>
             
-            <p className="text-lg mb-6">{movie.synopsis}</p>
+            <p className="text-lg mb-6">{movie.overview}</p>
 
             <AddToWatchlistButton item={movie} type="movies" />
 
@@ -183,18 +202,20 @@ export default function MovieDetailPage({ params }: { params: { slug: string }})
           </div>
         )}
 
-        <div className="mt-12">
-            <h2 className="text-2xl font-headline font-bold mb-4">Trailer</h2>
-            <div className="aspect-video">
-                <iframe 
-                    src={movie.trailerUrl}
-                    title={`Trailer for ${movie.title}`}
-                    className="w-full h-full rounded-lg"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                ></iframe>
-            </div>
-        </div>
+        {embeddableTrailerUrl && (
+          <div className="mt-12">
+              <h2 className="text-2xl font-headline font-bold mb-4">Trailer</h2>
+              <div className="aspect-video">
+                  <iframe 
+                      src={embeddableTrailerUrl}
+                      title={`Trailer for ${movie.title}`}
+                      className="w-full h-full rounded-lg"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                  ></iframe>
+              </div>
+          </div>
+        )}
       </article>
     </>
   );

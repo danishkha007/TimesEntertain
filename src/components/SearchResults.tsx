@@ -48,8 +48,8 @@ export default function SearchResults() {
       const moviesResult = movies.filter(
         (movie) =>
           movie.title.toLowerCase().includes(lowercaseQuery) ||
-          movie.castIds.some(id => personIdsMatchingQuery.includes(id)) ||
-          personIdsMatchingQuery.includes(movie.directorId)
+          movie.cast_ids.some(id => personIdsMatchingQuery.includes(id)) ||
+          movie.crew_ids.some(id => personIdsMatchingQuery.includes(id)) // Search crew too
       );
       setFilteredMovies(moviesResult);
 

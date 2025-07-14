@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Movie, TVShow } from '@/lib/types';
-import { cn } from '@/lib/utils';
+import { cn, slugify } from '@/lib/utils';
 
 interface ContentCardProps {
   item: Movie | TVShow;
@@ -11,13 +11,17 @@ interface ContentCardProps {
 }
 
 export function ContentCard({ item, type, className }: ContentCardProps) {
+  const slug = item.slug ?? slugify(item.title);
+  const posterUrl = 'poster_url' in item ? item.poster_url : item.posterUrl;
+  const year = 'release_date' in item ? new Date(item.release_date).getFullYear() : item.year;
+
   return (
-    <Link href={`/${type}/${item.slug}`} className="block group">
+    <Link href={`/${type}/${slug}`} className="block group mt-4">
       <Card className={cn("overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1", className)}>
         <CardContent className="p-0">
           <div className="aspect-[2/3] relative">
             <Image
-              src={item.posterUrl}
+              src={posterUrl}
               alt={`Poster for ${item.title}`}
               fill
               className="object-cover"
@@ -29,7 +33,7 @@ export function ContentCard({ item, type, className }: ContentCardProps) {
             <h3 className="font-semibold text-lg truncate group-hover:text-primary transition-colors">
               {item.title}
             </h3>
-            <p className="text-sm text-muted-foreground">{item.year}</p>
+            <p className="text-sm text-muted-foreground">{year}</p>
           </div>
         </CardContent>
       </Card>

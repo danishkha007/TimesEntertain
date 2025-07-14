@@ -25,7 +25,7 @@ function MovieCarousel() {
           throw new Error('Failed to fetch movies');
         }
         const movies: Movie[] = await res.json();
-        const sortedMovies = [...movies].sort((a, b) => b.rating - a.rating).slice(0, 10);
+        const sortedMovies = [...movies].sort((a, b) => (b.imdb_rating ?? 0) - (a.imdb_rating ?? 0)).slice(0, 10);
         setPopularMovies(sortedMovies);
       } catch (error) {
         console.error(error);

@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { Movie, TVShow } from '@/lib/types';
+import { slugify } from '@/lib/utils';
 
-type WatchlistItem = (Movie | TVShow) & { itemType: 'movies' | 'tv' };
+type WatchlistItem = (Movie | TVShow) & { itemType: 'movies' | 'tv', slug?: string };
 
 const WATCHLIST_KEY = 'timesentertain_watchlist';
 
@@ -35,7 +36,8 @@ export function useWatchlist() {
       if (prev.some((i) => i.id === item.id && i.itemType === type)) {
         return prev;
       }
-      return [...prev, { ...item, itemType: type }];
+      const slug = item.slug ?? slugify(item.title);
+      return [...prev, { ...item, itemType: type, slug }];
     });
   }, []);
 

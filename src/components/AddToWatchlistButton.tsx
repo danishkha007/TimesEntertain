@@ -5,6 +5,7 @@ import type { Movie, TVShow } from '@/lib/types';
 import { Button } from './ui/button';
 import { Bookmark, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { slugify } from '@/lib/utils';
 
 interface AddToWatchlistButtonProps {
   item: Movie | TVShow;
@@ -17,21 +18,6 @@ export default function AddToWatchlistButton({ item, type }: AddToWatchlistButto
   const isBookmarked = isInWatchlist(item.id, type);
 
   const handleToggleWatchlist = () => {
-    const watchlistMovieItem: Movie = {
-        id: item.id,
-        title: item.title,
-        slug: item.slug,
-        year: item.year,
-        rating: item.rating,
-        genre: item.genre,
-        synopsis: item.synopsis,
-        posterUrl: item.posterUrl,
-        trailerUrl: item.trailerUrl,
-        castIds: (item as Movie).castIds,
-        directorId: (item as Movie).directorId,
-        productionCompanyIds: (item as Movie).productionCompanyIds
-    }
-    
     if (isBookmarked) {
       removeFromWatchlist(item.id, type);
       toast({
@@ -39,7 +25,26 @@ export default function AddToWatchlistButton({ item, type }: AddToWatchlistButto
         description: `${item.title} has been removed from your watchlist.`,
       });
     } else {
-      const itemToAdd = type === 'movies' ? watchlistMovieItem : item;
+      let itemToAdd: Movie | TVShow;
+      if (type === 'movies') {
+        const movieItem = item as Movie;
+        itemToAdd = {
+          id: movieItem.id,
+          title: movieItem.title,
+          overview: movieItem.overview,
+          release_date: movieItem.release_date,
+          genres: movieItem.genres,
+          poster_url: movieItem.poster_url,
+          imdb_rating: movieItem.imdb_rating,
+          vote_count: movieItem.vote_count,
+          cast_ids: movieItem.cast_ids,
+          crew_ids: movieItem.crew_ids,
+          production_company_ids: movieItem.production_company_ids,
+          videos: movieItem.videos,
+        };
+      } else {
+        itemToAdd = item;
+      }
       addToWatchlist(itemToAdd, type);
       toast({
         title: "Added to Watchlist",

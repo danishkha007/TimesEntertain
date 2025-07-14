@@ -1,5 +1,14 @@
 [
-    { "id": 1, "name": "Specter Studios" },
-    { "id": 2, "name": "Galaxy Pictures" },
-    { "id": 3, "name": "Alchemist Films" }
+  {
+    "id": 33,
+    "name": "Universal Pictures",
+    "origin_country": "US",
+    "logo_url": null
+  },
+  {
+    "id": 1645,
+    "name": "Scott Free Productions",
+    "origin_country": "GB",
+    "logo_url": null
+  }
 ]
