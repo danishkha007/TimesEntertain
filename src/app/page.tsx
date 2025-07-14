@@ -20,7 +20,7 @@ function MovieCarousel() {
   useEffect(() => {
     async function fetchMovies() {
       try {
-        const res = await fetch('/TimesEntertain/data/movies.json');
+        const res = await fetch('/data/movies.json');
         if (!res.ok) {
           throw new Error('Failed to fetch movies');
         }
