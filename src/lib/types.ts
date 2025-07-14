@@ -56,6 +56,7 @@ export interface Movie extends ContentItem {
   // Populated fields
   cast?: (Person & { character?: string })[];
   director?: Person;
+  writers?: Person[];
   production?: ProductionCompany[];
 }
 

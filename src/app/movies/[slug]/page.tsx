@@ -60,6 +60,11 @@ async function getMovieData(slug: string): Promise<Movie | null> {
             p.crew_roles?.some(role => role.movie_id === movie.id && role.job === 'Director')
         );
 
+        const writers = persons.filter(p =>
+            movie.crew_ids.includes(p.id) &&
+            p.crew_roles?.some(role => role.movie_id === movie.id && role.department === 'Writing')
+        );
+
         const cast = movie.cast_ids
             .map(id => {
                 const person = persons.find(p => p.id === id);
@@ -72,7 +77,7 @@ async function getMovieData(slug: string): Promise<Movie | null> {
         
         const production = movie.production_company_ids.map(id => productions.find(p => p.id === id)).filter(Boolean) as ProductionCompany[];
         
-        return { ...movie, director, cast, production };
+        return { ...movie, director, cast, writers, production };
 
     } catch (error) {
         console.error('Error fetching movie data:', error);
@@ -212,6 +217,13 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
                 <div className="mt-6">
                     <h3 className="text-md font-semibold text-muted-foreground">Production Companies</h3>
                     <p className="text-sm">{movie.production.map(p => p.name).join(', ')}</p>
+                </div>
+            )}
+
+            {movie.writers && movie.writers.length > 0 && (
+                <div className="mt-6">
+                    <h3 className="text-md font-semibold text-muted-foreground">Writers</h3>
+                    <p className="text-sm">{movie.writers.map(w => w.name).join(', ')}</p>
                 </div>
             )}
           </div>
