@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -28,6 +29,9 @@ const formSchema = z.object({
 
 type ContactFormValues = z.infer<typeof formSchema>;
 
+// Replace this with your own form submission endpoint from a service like Formspree or Getform.
+const FORM_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID"; // <-- IMPORTANT: UPDATE THIS
+
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -44,14 +48,30 @@ export function ContactForm() {
   async function onSubmit(values: ContactFormValues) {
     setIsSubmitting(true);
     setSubmitError(null);
-    try {
-      // Since this is a static site, we can't send emails directly or write to files.
-      // We will log to console and show a success message.
-      // For a real application, you would replace this with a call
-      // to a third-party service (e.g., Formspree) or a serverless function.
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log("Form submitted (static site mock):", values);
 
+    // IMPORTANT: To make this form work, create an account on a form-backend service
+    // like Formspree (https://formspree.io/) and replace the FORM_ENDPOINT above.
+    if (FORM_ENDPOINT.includes("YOUR_FORM_ID")) {
+        console.error("Form submission is not configured. Please update the FORM_ENDPOINT in ContactForm.tsx.");
+        setSubmitError("The contact form is not configured. Please contact the site administrator.");
+        setIsSubmitting(false);
+        return;
+    }
+
+    try {
+      const response = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
+      
       toast({
         title: 'Message Sent!',
         description: 'Thank you for contacting us. We will get back to you shortly.',
@@ -60,7 +80,7 @@ export function ContactForm() {
 
     } catch (error) {
        const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
-       setSubmitError(errorMessage);
+       setSubmitError(`There was a problem sending your message: ${errorMessage}. Please try again later.`);
     } finally {
         setIsSubmitting(false);
     }
@@ -72,9 +92,9 @@ export function ContactForm() {
         {submitError && (
              <Alert variant="destructive">
                 <Terminal className="h-4 w-4" />
-                <AlertTitle>An Error Occurred</AlertTitle>
+                <AlertTitle>Could Not Send Message</AlertTitle>
                 <AlertDescription>
-                    {`There was a problem submitting your message: ${submitError}`}
+                    {submitError}
                 </AlertDescription>
             </Alert>
         )}
