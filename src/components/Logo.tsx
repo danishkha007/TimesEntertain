@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/router';
 
 interface LogoProps {
   className?: string;
