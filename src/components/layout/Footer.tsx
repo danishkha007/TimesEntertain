@@ -7,17 +7,23 @@ export function Footer() {
   return (
     <footer className="bg-muted/50 border-t mt-auto">
       <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row items-center justify-between">
-          <div className="flex items-center gap-2 mb-4 md:mb-0">
-            <Logo width={24} height={24} />
+        <div className="flex flex-col md:flex-row items-center justify-between h-16">
+          <div className="flex-1 flex justify-start">
+             <Logo width={24} height={24} />
           </div>
-          <p className="text-sm text-muted-foreground">
-            &copy; {currentYear} All rights reserved.
-          </p>
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
-             <Link href="#" className="text-sm text-muted-foreground hover:text-primary">About</Link>
-             <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Contact</Link>
-             <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Privacy Policy</Link>
+
+          <div className="flex-1 flex justify-center text-center my-4 md:my-0">
+            <p className="text-sm text-muted-foreground">
+              &copy; {currentYear} All rights reserved.
+            </p>
+          </div>
+
+          <div className="flex-1 flex justify-end">
+            <div className="flex items-center space-x-4">
+               <Link href="#" className="text-sm text-muted-foreground hover:text-primary">About</Link>
+               <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Contact</Link>
+               <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Privacy Policy</Link>
+            </div>
           </div>
         </div>
       </div>
