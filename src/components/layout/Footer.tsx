@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Logo } from "@/components/Logo";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -9,7 +8,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between h-16">
           <div className="flex-1 flex justify-start">
-             <Logo width={180} />
+             {/* Logo removed */}
           </div>
 
           <div className="flex-1 flex justify-center text-center my-4 md:my-0">
