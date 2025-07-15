@@ -18,6 +18,8 @@ import { useToast } from '@/hooks/use-toast';
 import { sendContactEmail } from '../actions';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Terminal } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -29,6 +31,7 @@ type ContactFormValues = z.infer<typeof formSchema>;
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { toast } = useToast();
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
@@ -41,6 +44,7 @@ export function ContactForm() {
 
   async function onSubmit(values: ContactFormValues) {
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const result = await sendContactEmail(values);
 
@@ -55,11 +59,7 @@ export function ContactForm() {
       }
     } catch (error) {
        const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: `There was a problem sending your message: ${errorMessage}`,
-      });
+       setSubmitError(errorMessage);
     } finally {
         setIsSubmitting(false);
     }
@@ -68,6 +68,17 @@ export function ContactForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {submitError && (
+             <Alert variant="destructive">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Could Not Send Email</AlertTitle>
+                <AlertDescription>
+                    {submitError}
+                    <br />
+                    Please verify your SMTP settings in the `.env` file.
+                </AlertDescription>
+            </Alert>
+        )}
         <FormField
           control={form.control}
           name="name"
