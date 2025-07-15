@@ -25,12 +25,14 @@ const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
   message: z.string().min(10, { message: 'Message must be at least 10 characters.' }).max(1000),
+  referrername: z.string().min(0, { message: 'Message must be at least 10 characters.' }).max(1000),
 });
 
 type ContactFormValues = z.infer<typeof formSchema>;
 
-// Replace this with your own form submission endpoint from a service like Formspree or Getform.
-const FORM_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID"; // <-- IMPORTANT: UPDATE THIS
+// Replace this with your own form submission endpoint.
+// Some services like Zoho Forms allow GET submissions with URL parameters.
+const FORM_ENDPOINT = "https://forms.zohopublic.in/infoakture1/form/Conatct/formperma/AUOumVEVsWgdP8Q_sJYnGcD1LXtrP6DM1RaTkPoKsLw"; // <-- IMPORTANT: UPDATE THIS
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +44,7 @@ export function ContactForm() {
       name: '',
       email: '',
       message: '',
+      referrername: 'timesentertain',
     },
   });
 
@@ -49,9 +52,7 @@ export function ContactForm() {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    // IMPORTANT: To make this form work, create an account on a form-backend service
-    // like Formspree (https://formspree.io/) and replace the FORM_ENDPOINT above.
-    if (FORM_ENDPOINT.includes("YOUR_FORM_ID")) {
+    if (FORM_ENDPOINT.includes("YOUR_FORM_ID_HERE")) {
         console.error("Form submission is not configured. Please update the FORM_ENDPOINT in ContactForm.tsx.");
         setSubmitError("The contact form is not configured. Please contact the site administrator.");
         setIsSubmitting(false);
@@ -59,18 +60,31 @@ export function ContactForm() {
     }
 
     try {
-      const response = await fetch(FORM_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
+      // Encode form values into URL query parameters
+      const params = new URLSearchParams({
+        name: values.name,
+        email: values.email,
+        message: values.message,
+        referrername: values.referrername,
+        // Zoho specific field names might be different, e.g., 'Name', 'Email'
+        // For Zoho, you might need to map:
+        // Name: values.name,
+        // Email: values.email,
+        // etc.
+      }).toString();
+      
+      const submissionUrl = `${FORM_ENDPOINT}?${params}`;
 
-      if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`);
-      }
+      // Use a simple GET request. Some form backends accept this.
+      // We use `mode: 'no-cors'` because we don't need to read the response,
+      // and this can prevent CORS errors with certain backends.
+      const response = await fetch(submissionUrl, {
+        method: 'GET',
+        mode: 'no-cors',
+      });
+      
+      // Since 'no-cors' mode results in an opaque response, we can't check response.ok.
+      // We will assume success if the fetch call itself doesn't throw an error.
       
       toast({
         title: 'Message Sent!',
