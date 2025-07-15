@@ -73,7 +73,7 @@ export function ContactForm() {
                 <Terminal className="h-4 w-4" />
                 <AlertTitle>Could Not Send Email</AlertTitle>
                 <AlertDescription>
-                    {submitError}
+                    {`There was a problem sending your message: ${submitError}`}
                     <br />
                     Please verify your SMTP settings in the `.env` file.
                 </AlertDescription>

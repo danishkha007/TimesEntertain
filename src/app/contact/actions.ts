@@ -47,14 +47,10 @@ export async function sendContactEmail(
   const transporter = nodemailer.createTransport({
     host: EMAIL_SERVER_HOST,
     port: parseInt(EMAIL_SERVER_PORT, 10),
-    secure: parseInt(EMAIL_SERVER_PORT, 10) === 465, // true for 465, false for other ports
+    secure: true, // Use true for port 465
     auth: {
       user: EMAIL_SERVER_USER,
       pass: EMAIL_SERVER_PASSWORD,
-    },
-    tls: {
-      // do not fail on invalid certs
-      rejectUnauthorized: false,
     },
   });
 
@@ -86,13 +82,6 @@ export async function sendContactEmail(
     return { success: true };
   } catch (error) {
     console.error('Failed to send email:', error);
-    const nodeError = error as NodeJS.ErrnoException;
-    if (nodeError.code === 'ENOTFOUND') {
-        return {
-            success: false,
-            error: `Could not connect to email server. Please check the hostname: ${EMAIL_SERVER_HOST}`,
-        };
-    }
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return { success: false, error: `Failed to send email. ${errorMessage}` };
   }
