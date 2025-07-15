@@ -1,14 +1,27 @@
+
+"use client";
+
+import { useState, useEffect } from 'react';
 import type { Metadata } from 'next';
 import { ContactForm } from './_components/ContactForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, Phone } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export const metadata: Metadata = {
-    title: 'Contact Us',
-    description: 'Get in touch with us. We would love to hear from you!',
-};
+// Note: Metadata is not used in Client Components, but we keep it for potential future static rendering
+// export const metadata: Metadata = {
+//     title: 'Contact Us',
+//     description: 'Get in touch with us. We would love to hear from you!',
+// };
 
 export default function ContactPage() {
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+        document.title = "Contact Us | TimesEntertain";
+    }, []);
+
     return (
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="space-y-8">
@@ -38,7 +51,16 @@ export default function ContactPage() {
                         <CardDescription>We typically respond within 24 hours.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <ContactForm />
+                        {isClient ? (
+                            <ContactForm />
+                        ) : (
+                            <div className="space-y-6">
+                                <Skeleton className="h-10 w-full" />
+                                <Skeleton className="h-10 w-full" />
+                                <Skeleton className="h-24 w-full" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>
