@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
 import type { Metadata } from 'next';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
+import { slugify } from '@/lib/utils';
+import Link from 'next/link';
 
 type Props = {
   params: { slug: string };
@@ -26,13 +28,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   
   const imageUrl = show.posterUrl || 'https://placehold.co/400x600.png';
+  const title = `${show.title} (${show.year}) | TV Show Details, Cast & Seasons`;
+  const description = `Find all the details about the TV show ${show.title}. Discover cast, director, number of seasons, ratings, and watch the official trailer.`;
+
 
   return {
-    title: show.title,
-    description: show.synopsis,
+    title,
+    description,
     openGraph: {
-      title: show.title,
-      description: show.synopsis,
+      title,
+      description,
       images: [
         {
           url: imageUrl,
@@ -41,6 +46,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           alt: `Poster for ${show.title}`,
         },
       ],
+      type: 'video.tv_show',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
     },
   };
 }
@@ -72,7 +84,7 @@ export default function TvShowDetailPage({ params }: Props) {
       '@type': 'AggregateRating',
       ratingValue: show.rating.toString(),
       bestRating: '10',
-      ratingCount: '1', // Mock value
+      ratingCount: '1', // Mock value, ideally this would come from your data
     },
   };
 
@@ -84,7 +96,7 @@ export default function TvShowDetailPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article>
+      <article className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
             <Image
@@ -112,7 +124,9 @@ export default function TvShowDetailPage({ params }: Props) {
               </div>
               <div className="flex flex-wrap gap-2">
                 {show.genre.map((g) => (
-                  <Badge key={g} variant="secondary">{g}</Badge>
+                  <Link key={g} href={`/genre/${slugify(g)}`}>
+                    <Badge variant="secondary" className="hover:bg-accent transition-colors">{g}</Badge>
+                  </Link>
                 ))}
               </div>
             </div>

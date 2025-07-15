@@ -94,6 +94,8 @@ async function getMovieData(slug: string): Promise<Movie | null> {
     }
 }
 
+const getYear = (dateString: string) => new Date(dateString).getFullYear();
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const movie = await getMovieData(params.slug);
 
@@ -104,13 +106,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 
   const imageUrl = movie.poster_url || 'https://placehold.co/400x600.png';
+  const year = getYear(movie.release_date);
+  const title = `${movie.title} (${year}) | Movie Details, Cast & Reviews`;
+  const description = `Explore details for the movie ${movie.title} (${year}). Find cast information, director, user reviews, ratings, where to watch, and watch official trailers. Your ultimate guide to ${movie.title}.`;
 
   return {
-    title: movie.title,
-    description: movie.overview,
+    title,
+    description,
     openGraph: {
-      title: movie.title,
-      description: movie.overview,
+      title,
+      description,
       images: [
         {
           url: imageUrl,
@@ -119,6 +124,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
           alt: `Poster for ${movie.title}`,
         },
       ],
+      type: 'video.movie',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
     },
   };
 }
@@ -144,8 +156,6 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
     notFound();
   }
   
-  const getYear = (dateString: string) => new Date(dateString).getFullYear();
-
   const topCast = movie.cast?.slice(0, 10) || [];
 
   const jsonLd = {
@@ -183,7 +193,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article>
+      <article className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
             <Image
