@@ -15,7 +15,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { sendContactEmail } from '../actions';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -46,7 +45,7 @@ export function ContactForm() {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      // Since this is a static site, we can't send emails directly.
+      // Since this is a static site, we can't send emails directly or write to files.
       // We will log to console and show a success message.
       // For a real application, you would replace this with a call
       // to a third-party service (e.g., Formspree) or a serverless function.
