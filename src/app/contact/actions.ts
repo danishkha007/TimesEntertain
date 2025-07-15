@@ -40,7 +40,7 @@ export async function sendContactEmail(
     console.error('Missing email environment variables');
     return {
       success: false,
-      error: 'Server is not configured to send emails.',
+      error: 'Server is not configured to send emails. Please check environment variables.',
     };
   }
 
@@ -86,6 +86,13 @@ export async function sendContactEmail(
     return { success: true };
   } catch (error) {
     console.error('Failed to send email:', error);
+    const nodeError = error as NodeJS.ErrnoException;
+    if (nodeError.code === 'ENOTFOUND') {
+        return {
+            success: false,
+            error: `Could not connect to email server. Please check the hostname: ${EMAIL_SERVER_HOST}`,
+        };
+    }
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return { success: false, error: `Failed to send email. ${errorMessage}` };
   }
