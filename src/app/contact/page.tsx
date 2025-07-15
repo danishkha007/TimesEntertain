@@ -21,8 +21,8 @@ export default function ContactPage() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-4">
                         <Mail className="w-5 h-5 text-primary" />
-                        <a href="mailto:contact@timesentertain.example.com" className="text-muted-foreground hover:text-primary">
-                            contact@timesentertain.example.com
+                        <a href="mailto:contact@timesentertain.com" className="text-muted-foreground hover:text-primary">
+                            contact@timesentertain.com
                         </a>
                     </div>
                      <div className="flex items-center gap-4">

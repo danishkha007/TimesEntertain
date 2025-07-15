@@ -55,7 +55,7 @@ export async function sendContactEmail(
   });
 
   const mailOptions = {
-    from: `"${name}" <${EMAIL_SERVER_USER}>`,
+    from: `"${name}" <${email}>`, // Set from address to be the user's email
     to: EMAIL_TO,
     replyTo: email,
     subject: `New Contact Form Message from ${name}`,
