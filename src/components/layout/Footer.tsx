@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 
 export function Footer() {
@@ -21,7 +22,7 @@ export function Footer() {
             <div className="flex items-center space-x-4">
                <Link href="#" className="text-sm text-muted-foreground hover:text-primary">About</Link>
                <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Contact</Link>
-               <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Privacy Policy</Link>
+               <Link href="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary">Privacy Policy</Link>
             </div>
           </div>
         </div>
