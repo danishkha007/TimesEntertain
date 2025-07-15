@@ -12,7 +12,7 @@ export function Footer() {
             <Logo width={24} height={24} />
           </div>
           <p className="text-sm text-muted-foreground">
-            &copy; {currentYear} TimesEntertain. All rights reserved.
+            &copy; {currentYear} All rights reserved.
           </p>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
              <Link href="#" className="text-sm text-muted-foreground hover:text-primary">About</Link>
