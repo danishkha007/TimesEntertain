@@ -15,6 +15,7 @@ export function Logo({ className, width = 32, height = 32 }: LogoProps) {
       width={width}
       height={height}
       className={cn(className)}
+      unoptimized
     />
   );
 }
