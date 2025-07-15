@@ -84,7 +84,7 @@ export default function TvShowDetailPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article className="max-w-4xl mx-auto">
+      <article>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
             <Image

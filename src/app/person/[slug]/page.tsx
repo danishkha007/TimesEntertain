@@ -94,7 +94,7 @@ export default async function PersonDetailPage({ params }: { params: { slug: str
   const profileUrl = person.profile_url || "https://placehold.co/400x600.png";
 
   return (
-    <article className="max-w-6xl mx-auto">
+    <article>
       <div className="grid md:grid-cols-4 gap-8">
         <div className="md:col-span-1">
           <Image
