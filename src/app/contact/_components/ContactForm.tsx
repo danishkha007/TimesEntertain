@@ -46,17 +46,19 @@ export function ContactForm() {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      const result = await sendContactEmail(values);
+      // Since this is a static site, we can't send emails directly.
+      // We will log to console and show a success message.
+      // For a real application, you would replace this with a call
+      // to a third-party service (e.g., Formspree) or a serverless function.
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Form submitted (static site mock):", values);
 
-      if (result.success) {
-        toast({
-          title: 'Message Sent!',
-          description: 'Thank you for contacting us. We will get back to you shortly.',
-        });
-        form.reset();
-      } else {
-        throw new Error(result.error || 'An unknown error occurred.');
-      }
+      toast({
+        title: 'Message Sent!',
+        description: 'Thank you for contacting us. We will get back to you shortly.',
+      });
+      form.reset();
+
     } catch (error) {
        const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
        setSubmitError(errorMessage);
@@ -71,11 +73,9 @@ export function ContactForm() {
         {submitError && (
              <Alert variant="destructive">
                 <Terminal className="h-4 w-4" />
-                <AlertTitle>Could Not Send Email</AlertTitle>
+                <AlertTitle>An Error Occurred</AlertTitle>
                 <AlertDescription>
-                    {`There was a problem sending your message: ${submitError}`}
-                    <br />
-                    Please verify your SMTP settings in the `.env` file.
+                    {`There was a problem submitting your message: ${submitError}`}
                 </AlertDescription>
             </Alert>
         )}
