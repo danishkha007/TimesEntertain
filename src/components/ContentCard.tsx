@@ -21,8 +21,8 @@ export function ContentCard({ item, type, className }: ContentCardProps) {
   const year = 'release_date' in item && item.release_date ? new Date(item.release_date).getFullYear() : ('year' in item ? item.year : '');
 
   return (
-    <Link href={`/${type}/${slug}`} className="block group mt-4">
-      <Card className={cn("overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1", className)}>
+    <Link href={`/${type}/${slug}`} className="block group">
+      <Card className={cn("overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1 mt-4", className)}>
         <CardContent className="p-0">
           <div className="aspect-[2/3] relative">
             <Image

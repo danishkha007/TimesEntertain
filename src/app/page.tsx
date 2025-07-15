@@ -75,7 +75,6 @@ function MovieCarousel({ popularMovies }: { popularMovies: Movie[] }) {
     <Carousel
       opts={{
         align: 'start',
-        loop: true,
       }}
       className="w-full"
     >
@@ -104,7 +103,6 @@ function PersonCarousel({ people }: { people: Person[] }) {
     <Carousel
       opts={{
         align: 'start',
-        loop: true,
       }}
       className="w-full"
     >
@@ -159,7 +157,6 @@ export default async function Home() {
         <Carousel
           opts={{
             align: 'start',
-            loop: true,
           }}
           className="w-full"
         >
