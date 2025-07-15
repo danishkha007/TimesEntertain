@@ -52,6 +52,10 @@ export async function sendContactEmail(
       user: EMAIL_SERVER_USER,
       pass: EMAIL_SERVER_PASSWORD,
     },
+    tls: {
+      // do not fail on invalid certs
+      rejectUnauthorized: false,
+    },
   });
 
   const mailOptions = {
