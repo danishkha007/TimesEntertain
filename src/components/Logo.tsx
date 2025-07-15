@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/router';
 
 interface LogoProps {
   className?: string;
@@ -8,9 +8,11 @@ interface LogoProps {
 }
 
 export function Logo({ className, width = 32, height = 32 }: LogoProps) {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  
   return (
-    <Image
-      src="/logo.png"
+    <img
+      src={`${basePath}/logo.png`}
       alt="TimesEntertain Logo"
       width={width}
       height={height}
