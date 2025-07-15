@@ -47,10 +47,14 @@ export async function sendContactEmail(
   const transporter = nodemailer.createTransport({
     host: EMAIL_SERVER_HOST,
     port: parseInt(EMAIL_SERVER_PORT, 10),
-    secure: true, // Use true for port 465
+    secure: true, // true for 465, false for other ports
     auth: {
       user: EMAIL_SERVER_USER,
       pass: EMAIL_SERVER_PASSWORD,
+    },
+    tls: {
+      // This is often required for self-hosted mail servers.
+      ciphers: 'SSLv3',
     },
   });
 
