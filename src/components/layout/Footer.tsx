@@ -10,9 +10,6 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
             <Logo width={24} height={24} />
-            <span className="text-md font-headline font-semibold">
-              TimesEntertain
-            </span>
           </div>
           <p className="text-sm text-muted-foreground">
             &copy; {currentYear} TimesEntertain. All rights reserved.
