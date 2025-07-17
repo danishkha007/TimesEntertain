@@ -191,7 +191,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
     ? Array.from(new Set(movie.ott_platforms
         .filter(p => typeof p === 'string' && p.trim() !== '')
         .map(p => getProviderLogo(p).normalizedName)
-        .filter(name => name !== 'Unknown')))
+        .filter(name => name !== 'Unknown' && name !== 'Google Play')))
         .map(normalizedName => {
           const { logoUrl } = getProviderLogo(normalizedName);
           return {

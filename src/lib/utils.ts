@@ -23,11 +23,11 @@ export function getProviderLogo(providerName: string): { normalizedName: string,
 
   const providers: { [key: string]: { normalizedName: string, logo: string, aliases: string[] } } = {
     'netflix': { normalizedName: 'Netflix', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg', aliases: ['netflix', 'netflix basic with ads'] },
-    'amazon prime video': { normalizedName: 'Amazon Prime Video', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Amazon_Prime_Video_blue_logo_1.svg', aliases: ['amazon prime video', 'amazon video', 'prime video', 'amazon prime video with ads'] },
+    'amazon prime video': { normalizedName: 'Amazon Prime Video', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/72/Amazon_Prime_logo_%282022%29.svg', aliases: ['amazon prime video', 'amazon video', 'prime video', 'amazon prime video with ads'] },
     'disney plus': { normalizedName: 'Disney+', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg', aliases: ['disney plus', 'disney+'] },
     'hbo max': { normalizedName: 'Max', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/19/HBO_Max_Logo.svg', aliases: ['hbo max', 'max', 'hbo'] },
     'hulu': { normalizedName: 'Hulu', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Hulu_Logo.svg', aliases: ['hulu'] },
-    'apple tv plus': { normalizedName: 'Apple TV+', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_Logo.svg', aliases: ['apple tv plus', 'apple tv+'] },
+    'apple tv plus': { normalizedName: 'Apple TV+', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_Logo.svg', aliases: ['apple tv plus', 'apple tv+', 'apple tv'] },
     'paramount plus': { normalizedName: 'Paramount+', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e1/Paramount%2B_logo.svg', aliases: ['paramount plus', 'paramount+'] },
     'peacock': { normalizedName: 'Peacock', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Peacock_logo.svg', aliases: ['peacock', 'peacock premium'] },
     'youtube': { normalizedName: 'YouTube', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_logo_%282017%29.svg', aliases: ['youtube', 'youtube premium'] },
