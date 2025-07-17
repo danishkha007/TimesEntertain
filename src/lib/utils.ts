@@ -30,9 +30,11 @@ export function getProviderLogo(providerName: string): { normalizedName: string,
     'apple tv plus': { normalizedName: 'Apple TV+', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_Logo.svg', aliases: ['apple tv plus', 'apple tv+', 'apple tv'] },
     'paramount plus': { normalizedName: 'Paramount+', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e1/Paramount%2B_logo.svg', aliases: ['paramount plus', 'paramount+'] },
     'peacock': { normalizedName: 'Peacock', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Peacock_logo.svg', aliases: ['peacock', 'peacock premium'] },
-    'youtube': { normalizedName: 'YouTube', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_logo_%282017%29.svg', aliases: ['youtube', 'youtube premium'] },
+    'youtube': { normalizedName: 'YouTube', logo: 'https://upload.wikimedia.org/wikipedia/commons/9/90/Logo_of_YouTube_%282013-2015%29.svg', aliases: ['youtube', 'youtube premium'] },
     'google play': { normalizedName: 'Google Play', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d6/Google_Play_logo_2022.svg', aliases: ['google play movies', 'google play movies & tv'] },
     'vudu': { normalizedName: 'Vudu', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/52/Vudu_2016.svg', aliases: ['vudu'] },
+    'zee5': { normalizedName: 'Zee5', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Zee5-official-logo.svg', aliases: ['zee5'] },
+    'hungama play': { normalizedName: 'Hungama Play', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Hungama_Play_logo.svg/1024px-Hungama_Play_logo.svg.png', aliases: ['hungama play', 'hungama'] },
   };
 
   for (const key in providers) {
