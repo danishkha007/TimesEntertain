@@ -58,7 +58,7 @@ export interface Movie extends ContentItem {
   crew_ids: number[];
   production_company_ids: number[];
   videos?: Video[];
-  watch_providers?: WatchProvider[];
+  ott_platforms?: WatchProvider[];
 
   // Populated fields
   cast?: (Person & { character?: string })[];
