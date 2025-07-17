@@ -246,7 +246,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             
             <p className="text-lg mb-6">{movie.overview}</p>
 
-            <div className="flex flex-wrap items-center gap-6">
+            <div className="flex flex-wrap items-center gap-4">
               <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" />
               <WatchProviders providers={uniqueProviders} />
             </div>
