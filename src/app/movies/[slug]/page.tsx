@@ -188,9 +188,11 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
   const posterUrl = movie.poster_url || "https://placehold.co/400x600.png";
 
   const uniqueProviders = movie.ott_platforms
-    ? Array.from(new Set(movie.ott_platforms.map(p => getProviderLogo(p.provider_name).normalizedName)))
+    ? Array.from(new Set(movie.ott_platforms
+        .filter(p => typeof p?.provider_name === 'string') // Filter out invalid entries
+        .map(p => getProviderLogo(p.provider_name).normalizedName)))
         .map(normalizedName => {
-          const originalProvider = movie.ott_platforms!.find(p => getProviderLogo(p.provider_name).normalizedName === normalizedName);
+          const originalProvider = movie.ott_platforms!.find(p => p && getProviderLogo(p.provider_name).normalizedName === normalizedName);
           return {
             provider_name: originalProvider!.provider_name,
             provider_logo_url: getProviderLogo(originalProvider!.provider_name).logoUrl
