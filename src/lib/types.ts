@@ -38,6 +38,7 @@ export interface Video {
 export interface WatchProvider {
   provider_name: string;
   provider_logo_url: string | null;
+  link: string;
 }
 
 export interface ContentItem {

@@ -10,6 +10,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { PlayCircle } from 'lucide-react';
+import Link from 'next/link';
 
 interface WatchProvidersProps {
     providers: WatchProvider[];
@@ -38,7 +39,7 @@ export function WatchProviders({ providers }: WatchProvidersProps) {
                     </div>
                     <div className="flex flex-wrap items-center gap-4">
                         {providers.map(provider => (
-                            <div key={provider.provider_name} className="transition-transform hover:scale-105" title={provider.provider_name}>
+                            <Link key={provider.provider_name} href={provider.link} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105" title={provider.provider_name}>
                                 <div className="w-12 h-12 relative rounded-lg overflow-hidden border bg-white flex items-center justify-center">
                                 {provider.provider_logo_url ? (
                                         <Image
@@ -52,7 +53,7 @@ export function WatchProviders({ providers }: WatchProvidersProps) {
                                         <span className="text-xs text-center text-muted-foreground p-1">{provider.provider_name}</span>
                                 )}
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>

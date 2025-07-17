@@ -193,10 +193,11 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
         .map(p => getProviderLogo(p).normalizedName)
         .filter(name => name !== 'Unknown' && name !== 'Google Play')))
         .map(normalizedName => {
-          const { logoUrl } = getProviderLogo(normalizedName);
+          const { logoUrl, link } = getProviderLogo(normalizedName);
           return {
             provider_name: normalizedName,
             provider_logo_url: logoUrl,
+            link: link,
           };
         })
     : [];
