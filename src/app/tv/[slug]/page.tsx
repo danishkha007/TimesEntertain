@@ -1,3 +1,4 @@
+
 import { tvShows } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -133,7 +134,7 @@ export default function TvShowDetailPage({ params }: Props) {
             
             <p className="text-lg mb-6">{show.synopsis}</p>
 
-            <AddToWatchlistButton item={show} type="tv" />
+            <AddToWatchlistButton item={{id: show.id, title: show.title}} type="tv" />
           </div>
         </div>
 

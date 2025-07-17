@@ -232,7 +232,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             
             <p className="text-lg mb-6">{movie.overview}</p>
 
-            <AddToWatchlistButton item={movie} type="movies" />
+            <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" />
 
             <WatchProviders providers={movie.ott_platforms || []} />
 

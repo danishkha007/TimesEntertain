@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
 import type { Movie, TVShow } from '@/lib/types';
 import { slugify } from '@/lib/utils';
 
-type WatchlistItem = (Movie | TVShow) & { itemType: 'movies' | 'tv', slug?: string };
+type WatchlistItem = (Partial<Movie> & Partial<TVShow> & { id: number, title: string }) & { itemType: 'movies' | 'tv', slug?: string };
 
 const WATCHLIST_KEY = 'timesentertain_watchlist';
 
@@ -31,12 +32,12 @@ export function useWatchlist() {
     }
   }, [watchlist, isLoaded]);
 
-  const addToWatchlist = useCallback((item: Movie | TVShow, type: 'movies' | 'tv') => {
+  const addToWatchlist = useCallback((item: {id: number, title: string}, type: 'movies' | 'tv') => {
     setWatchlist((prev) => {
       if (prev.some((i) => i.id === item.id && i.itemType === type)) {
         return prev;
       }
-      const slug = item.slug ?? slugify(item.title);
+      const slug = slugify(item.title);
       return [...prev, { ...item, itemType: type, slug }];
     });
   }, []);

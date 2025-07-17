@@ -6,10 +6,9 @@ import type { Movie, TVShow } from '@/lib/types';
 import { Button } from './ui/button';
 import { Bookmark, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { slugify } from '@/lib/utils';
 
 interface AddToWatchlistButtonProps {
-  item: Movie | TVShow;
+  item: { id: number; title: string };
   type: 'movies' | 'tv';
 }
 
