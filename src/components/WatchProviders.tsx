@@ -11,12 +11,14 @@ import {
 } from '@/components/ui/popover';
 import { PlayCircle } from 'lucide-react';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 interface WatchProvidersProps {
     providers: WatchProvider[];
+    className?: string;
 }
 
-export function WatchProviders({ providers }: WatchProvidersProps) {
+export function WatchProviders({ providers, className }: WatchProvidersProps) {
     if (!providers || providers.length === 0) {
         return null;
     }
@@ -24,7 +26,7 @@ export function WatchProviders({ providers }: WatchProvidersProps) {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="lg" className={cn(className)}>
                     <PlayCircle className="mr-2" />
                     Watch Now
                 </Button>
