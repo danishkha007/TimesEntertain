@@ -23,7 +23,7 @@ export function getProviderLogo(providerName: string): { normalizedName: string,
 
   const providers: { [key: string]: { normalizedName: string, logo: string, aliases: string[] } } = {
     'netflix': { normalizedName: 'Netflix', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg', aliases: ['netflix', 'netflix basic with ads'] },
-    'amazon prime video': { normalizedName: 'Amazon Prime Video', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Prime_Video_logo.svg', aliases: ['amazon prime video', 'amazon video', 'prime video'] },
+    'amazon prime video': { normalizedName: 'Amazon Prime Video', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Amazon_Prime_Video_blue_logo_1.svg', aliases: ['amazon prime video', 'amazon video', 'prime video', 'amazon prime video with ads'] },
     'disney plus': { normalizedName: 'Disney+', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg', aliases: ['disney plus', 'disney+'] },
     'hbo max': { normalizedName: 'Max', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/19/HBO_Max_Logo.svg', aliases: ['hbo max', 'max', 'hbo'] },
     'hulu': { normalizedName: 'Hulu', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Hulu_Logo.svg', aliases: ['hulu'] },
