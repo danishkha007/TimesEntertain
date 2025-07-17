@@ -10,11 +10,12 @@ interface LogoProps {
 }
 
 export function Logo({ className, width, height }: LogoProps) {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  // When basePath is removed, assets are served from the root.
+  const logoPath = '/logo.png';
   
   return (
     <img
-      src={`${basePath}/logo.png`}
+      src={logoPath}
       alt="TimesEntertain Logo"
       width={width}
       height={height} 

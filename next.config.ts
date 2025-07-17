@@ -3,10 +3,6 @@ import type {NextConfig} from 'next';
 const nextConfig: NextConfig = {
   /* config options here */
   output: 'export',
-  basePath: '/TimesEntertain',
-  env: {
-    NEXT_PUBLIC_BASE_PATH: '/TimesEntertain',
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
