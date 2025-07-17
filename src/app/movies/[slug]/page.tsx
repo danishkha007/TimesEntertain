@@ -8,7 +8,7 @@ import AddToWatchlistButton from '@/components/AddToWatchlistButton';
 import type { Movie, Person, ProductionCompany, Video, WatchProvider } from '@/lib/types';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { slugify } from '@/lib/utils';
+import { getProviderLogo, slugify } from '@/lib/utils';
 import type { Metadata } from 'next';
 import {
   Carousel,
@@ -187,10 +187,16 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
   
   const posterUrl = movie.poster_url || "https://placehold.co/400x600.png";
 
-  const plainProviders = (movie.ott_platforms || []).map(p => ({
-    provider_name: p.provider_name,
-    provider_logo_url: p.provider_logo_url
-  }));
+  const uniqueProviders = movie.ott_platforms
+    ? Array.from(new Set(movie.ott_platforms.map(p => getProviderLogo(p.provider_name).normalizedName)))
+        .map(normalizedName => {
+          const originalProvider = movie.ott_platforms!.find(p => getProviderLogo(p.provider_name).normalizedName === normalizedName);
+          return {
+            provider_name: originalProvider!.provider_name,
+            provider_logo_url: getProviderLogo(originalProvider!.provider_name).logoUrl
+          };
+        })
+    : [];
 
   return (
     <>
@@ -239,7 +245,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
 
             <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" />
 
-            <WatchProviders providers={plainProviders} />
+            <WatchProviders providers={uniqueProviders} />
 
             {movie.production && movie.production.length > 0 && (
                 <div className="mt-6">
