@@ -14,18 +14,19 @@ export function WatchProviders({ providers }: WatchProvidersProps) {
     }
 
     return (
-        <div className="mt-8">
-            <h3 className="text-lg font-headline font-semibold mb-3">Where to Watch</h3>
-            <div className="flex flex-wrap items-center gap-4">
+        <div>
+            <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground">|</span>
+                <span className="text-sm font-medium text-muted-foreground">Where to Watch:</span>
                 {providers.map(provider => (
                     <div key={provider.provider_name} className="transition-transform hover:scale-105" title={provider.provider_name}>
-                        <div className="w-12 h-12 relative rounded-lg overflow-hidden border bg-white flex items-center justify-center">
+                        <div className="w-10 h-10 relative rounded-lg overflow-hidden border bg-white flex items-center justify-center">
                            {provider.provider_logo_url ? (
                                 <Image
                                     src={provider.provider_logo_url}
                                     alt={`${provider.provider_name} logo`}
                                     fill
-                                    sizes="50px"
+                                    sizes="40px"
                                     className="object-contain p-1"
                                 />
                            ) : (

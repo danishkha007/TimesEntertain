@@ -189,6 +189,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
 
   const uniqueProviders = movie.ott_platforms
     ? Array.from(new Set(movie.ott_platforms
+        .filter(p => typeof p === 'string' && p.trim() !== '')
         .map(p => getProviderLogo(p).normalizedName)
         .filter(name => name !== 'Unknown')))
         .map(normalizedName => {
@@ -245,9 +246,11 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             
             <p className="text-lg mb-6">{movie.overview}</p>
 
-            <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" />
+            <div className="flex flex-wrap items-center gap-6">
+              <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" />
+              <WatchProviders providers={uniqueProviders} />
+            </div>
 
-            <WatchProviders providers={uniqueProviders} />
 
             {movie.production && movie.production.length > 0 && (
                 <div className="mt-6">
