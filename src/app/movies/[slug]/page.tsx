@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
-import type { Movie, Person, ProductionCompany, Video } from '@/lib/types';
+import type { Movie, Person, ProductionCompany, Video, WatchProvider } from '@/lib/types';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { slugify } from '@/lib/utils';
@@ -43,16 +43,19 @@ async function getMovieData(slug: string): Promise<Movie | null> {
         const movieFilePath = path.join(process.cwd(), 'public/movies.json');
         const personFilePath = path.join(process.cwd(), 'public/persons.json');
         const productionFilePath = path.join(process.cwd(), 'public/production.json');
+        const providersFilePath = path.join(process.cwd(), 'public/watch_providers.json');
         
-        const [moviesFile, personsFile, productionsFile] = await Promise.all([
+        const [moviesFile, personsFile, productionsFile, providersFile] = await Promise.all([
             fs.readFile(movieFilePath, 'utf-8'),
             fs.readFile(personFilePath, 'utf-8'),
             fs.readFile(productionFilePath, 'utf-8'),
+            fs.readFile(providersFilePath, 'utf-8'),
         ]);
 
         const movies: Movie[] = JSON.parse(moviesFile);
         const persons: Person[] = JSON.parse(personsFile);
         const productions: ProductionCompany[] = JSON.parse(productionsFile);
+        const allProviders: (WatchProvider & { movie_id: number })[] = JSON.parse(providersFile);
         
         const movie = movies.find((m) => slugify(m.title) === slug);
 
@@ -86,7 +89,9 @@ async function getMovieData(slug: string): Promise<Movie | null> {
         
         const production = movie.production_company_ids.map(id => productions.find(p => p.id === id)).filter(Boolean) as ProductionCompany[];
         
-        return { ...movie, director, cast, writers, composers, production };
+        const watch_providers = allProviders.filter(p => p.movie_id === movie.id);
+        
+        return { ...movie, director, cast, writers, composers, production, watch_providers };
 
     } catch (error) {
         console.error('Error fetching movie data:', error);
