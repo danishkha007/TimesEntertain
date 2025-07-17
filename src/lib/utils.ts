@@ -16,6 +16,9 @@ export function slugify(text: string): string {
 }
 
 export function getProviderLogo(providerName: string): { normalizedName: string, logoUrl: string | null } {
+  if (typeof providerName !== 'string') {
+    return { normalizedName: 'Unknown', logoUrl: null };
+  }
   const name = providerName.toLowerCase();
 
   const providers: { [key: string]: { normalizedName: string, logo: string } } = {
