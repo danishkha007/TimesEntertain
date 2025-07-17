@@ -187,6 +187,12 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
   
   const posterUrl = movie.poster_url || "https://placehold.co/400x600.png";
 
+  const plainProviders = (movie.ott_platforms || []).map(p => ({
+    provider_name: p.provider_name,
+    provider_logo_url: p.provider_logo_url,
+    link: p.link
+  }));
+
   return (
     <>
       <script
@@ -234,7 +240,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
 
             <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" />
 
-            <WatchProviders providers={movie.ott_platforms || []} />
+            <WatchProviders providers={plainProviders} />
 
             {movie.production && movie.production.length > 0 && (
                 <div className="mt-6">
