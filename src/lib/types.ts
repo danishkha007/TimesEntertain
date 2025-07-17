@@ -37,8 +37,7 @@ export interface Video {
 
 export interface WatchProvider {
   provider_name: string;
-  provider_logo_url: string;
-  link: string;
+  provider_logo_url: string | null;
 }
 
 export interface ContentItem {
@@ -58,7 +57,7 @@ export interface Movie extends ContentItem {
   crew_ids: number[];
   production_company_ids: number[];
   videos?: Video[];
-  ott_platforms?: WatchProvider[];
+  ott_platforms?: string[];
 
   // Populated fields
   cast?: (Person & { character?: string })[];

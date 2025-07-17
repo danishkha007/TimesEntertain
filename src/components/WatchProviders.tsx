@@ -5,7 +5,7 @@ import type { WatchProvider } from '@/lib/types';
 import Image from 'next/image';
 
 interface WatchProvidersProps {
-    providers: Partial<WatchProvider>[];
+    providers: WatchProvider[];
 }
 
 export function WatchProviders({ providers }: WatchProvidersProps) {
