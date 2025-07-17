@@ -189,8 +189,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
 
   const plainProviders = (movie.ott_platforms || []).map(p => ({
     provider_name: p.provider_name,
-    provider_logo_url: p.provider_logo_url,
-    link: String(p.link)
+    provider_logo_url: p.provider_logo_url
   }));
 
   return (

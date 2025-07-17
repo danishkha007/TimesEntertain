@@ -3,10 +3,9 @@
 
 import type { WatchProvider } from '@/lib/types';
 import Image from 'next/image';
-import Link from 'next/link';
 
 interface WatchProvidersProps {
-    providers: WatchProvider[];
+    providers: Partial<WatchProvider>[];
 }
 
 export function WatchProviders({ providers }: WatchProvidersProps) {
@@ -19,7 +18,7 @@ export function WatchProviders({ providers }: WatchProvidersProps) {
             <h3 className="text-lg font-headline font-semibold mb-3">Where to Watch</h3>
             <div className="flex flex-wrap items-center gap-4">
                 {providers.map(provider => (
-                    <Link href={provider.link} key={provider.provider_name} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                    <div key={provider.provider_name} className="transition-transform hover:scale-105">
                         <div className="w-12 h-12 relative rounded-lg overflow-hidden border">
                             <Image
                                 src={provider.provider_logo_url || "https://placehold.co/50x50.png"}
@@ -29,7 +28,7 @@ export function WatchProviders({ providers }: WatchProvidersProps) {
                                 className="object-cover"
                             />
                         </div>
-                    </Link>
+                    </div>
                 ))}
             </div>
         </div>
