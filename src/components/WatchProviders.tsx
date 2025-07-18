@@ -60,7 +60,7 @@ export function WatchProviders({ providers, className }: WatchProvidersProps) {
                                                 alt={`${provider.provider_name} logo`}
                                                 fill
                                                 sizes="48px"
-                                                className="object-contain p-1"
+                                                className="object-contain"
                                             />
                                         </div>
                                     </div>
