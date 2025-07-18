@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 
 interface MovieFiltersProps {
   genres: string[];
@@ -18,7 +19,7 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const handleValueChange = (key: 'sort' | 'genre', value: string) => {
+  const handleValueChange = useCallback((key: 'sort' | 'genre', value: string) => {
     const current = new URLSearchParams(Array.from(searchParams.entries()));
 
     if (!value || value === "all") {
@@ -26,11 +27,14 @@ export function MovieFilters({ genres }: MovieFiltersProps) {
     } else {
       current.set(key, value);
     }
+    
+    // When a filter changes, reset to the first page
+    current.delete('page');
 
     const search = current.toString();
     const query = search ? `?${search}` : "";
     router.push(`/movies${query}`);
-  };
+  }, [searchParams, router]);
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
