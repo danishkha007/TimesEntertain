@@ -1,3 +1,4 @@
+
 import {
   Carousel,
   CarouselContent,
@@ -11,6 +12,12 @@ import { ContentCard } from '@/components/ContentCard';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { PersonCard } from '@/components/PersonCard';
+import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
+import { Star } from 'lucide-react';
+import Link from 'next/link';
+import { slugify } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 async function getPopularMovies(): Promise<Movie[]> {
   try {
@@ -124,6 +131,7 @@ function PersonCarousel({ people }: { people: Person[] }) {
 
 export default async function Home() {
   const popularMovies = await getPopularMovies();
+  const highestRatedMovies = popularMovies.slice(0, 5);
   const popularTvShows = [...tvShows]
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 10);
@@ -133,14 +141,68 @@ export default async function Home() {
 
   return (
     <div className="space-y-12">
-      <section>
-        <h1 className="text-3xl font-headline font-bold mb-6">
-          Welcome to TimesEntertain
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Your ultimate guide to the world of movies and TV shows. Discover,
-          watch, and enjoy.
-        </p>
+      <section className="relative -mx-4 -mt-8 mb-12 overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
+            src="https://placehold.co/1200x600.png"
+            alt="Hero background"
+            fill
+            className="object-cover"
+            data-ai-hint="abstract cinematic"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
+        </div>
+        <div className="relative container mx-auto px-4 py-16 sm:py-24">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-5xl font-headline font-bold text-foreground">
+                Welcome to TimesEntertain
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Your ultimate guide to the world of movies and TV shows.
+                Discover, watch, and enjoy.
+              </p>
+              <Button asChild size="lg">
+                <Link href="/movies">Explore Movies</Link>
+              </Button>
+            </div>
+            <div className="p-6 bg-black/30 backdrop-blur-lg rounded-xl border border-white/10 shadow-2xl">
+              <h3 className="text-xl font-bold text-white mb-4">
+                Highest Rated Movies
+              </h3>
+              <div className="space-y-4">
+                {highestRatedMovies.map((movie) => (
+                  <Link
+                    key={movie.id}
+                    href={`/movies/${slugify(movie.title)}`}
+                    className="flex items-center gap-4 group bg-white/5 p-2 rounded-lg transition-colors hover:bg-white/10"
+                  >
+                    <div className="w-16 h-24 relative flex-shrink-0">
+                      <Image
+                        src={movie.poster_url}
+                        alt={`Poster for ${movie.title}`}
+                        fill
+                        className="object-cover rounded-md"
+                        sizes="64px"
+                        data-ai-hint="movie poster"
+                      />
+                    </div>
+                    <div className="flex-grow">
+                      <h4 className="font-semibold text-white group-hover:text-primary transition-colors">
+                        {movie.title}
+                      </h4>
+                      <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span>{movie.imdb_rating?.toFixed(1)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section>
