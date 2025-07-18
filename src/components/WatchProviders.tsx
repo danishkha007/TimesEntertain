@@ -49,7 +49,7 @@ export function WatchProviders({ providers }: WatchProvidersProps) {
                             </div>
                         ))}
                     </div>
-                    {index < availableCategories.length - 1 && <Separator className="mt-3 -mx-4 w-auto" />}
+                    {index < availableCategories.length - 1 && <Separator className="mt-3 w-auto" />}
                 </div>
             ))}
         </div>

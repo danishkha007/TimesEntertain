@@ -18,6 +18,7 @@ import { Star } from 'lucide-react';
 import Link from 'next/link';
 import { slugify } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { HeroMovieCard } from '@/components/HeroMovieCard';
 
 async function getPopularMovies(): Promise<Movie[]> {
   try {
@@ -168,39 +169,25 @@ export default async function Home() {
                 <Link href="/movies">Explore Movies</Link>
               </Button>
             </div>
-            <div className="p-6 bg-black/30 backdrop-blur-lg rounded-xl border border-white/10 shadow-2xl">
-              <h3 className="text-xl font-bold text-white mb-4">
+            <div>
+               <h3 className="text-xl font-bold text-foreground mb-4">
                 Highest Rated Movies
               </h3>
-              <div className="space-y-4">
-                {highestRatedMovies.map((movie) => (
-                  <Link
-                    key={movie.id}
-                    href={`/movies/${slugify(movie.title)}`}
-                    className="flex items-center gap-4 group bg-white/5 p-2 rounded-lg transition-colors hover:bg-white/10"
-                  >
-                    <div className="w-16 h-24 relative flex-shrink-0">
-                      <Image
-                        src={movie.poster_url}
-                        alt={`Poster for ${movie.title}`}
-                        fill
-                        className="object-cover rounded-md"
-                        sizes="64px"
-                        data-ai-hint="movie poster"
-                      />
-                    </div>
-                    <div className="flex-grow">
-                      <h4 className="font-semibold text-white group-hover:text-primary transition-colors">
-                        {movie.title}
-                      </h4>
-                      <div className="flex items-center gap-2 text-sm text-gray-300">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span>{movie.imdb_rating?.toFixed(1)}</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+               <Carousel
+                opts={{
+                  align: 'start',
+                  loop: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-2">
+                  {highestRatedMovies.map((movie) => (
+                    <CarouselItem key={movie.id} className="basis-1/2 md:basis-1/3 pl-2">
+                      <HeroMovieCard movie={movie} />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             </div>
           </div>
         </div>
