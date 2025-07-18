@@ -143,7 +143,7 @@ export default async function Home() {
 
   return (
     <div className="space-y-12">
-      <section className="relative w-screen -translate-x-1/2 left-1/2 -top-8 mb-4 overflow-hidden rounded-b-2xl bg-black/20 backdrop-blur-sm">
+      <section className="relative w-screen -translate-x-1/2 left-1/2 -top-8 mb-4 overflow-hidden rounded-b-2xl bg-black/20 backdrop-blur-sm h-[80vh] flex flex-col justify-center">
         <div className="absolute inset-0 -z-10">
           <Image
             src="/background.png"
@@ -154,7 +154,7 @@ export default async function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
         </div>
-        <div className="relative container mx-auto px-4 py-16 sm:py-24">
+        <div className="relative container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="space-y-6">
               <h1 className="text-4xl md:text-5xl font-headline font-bold text-foreground">
