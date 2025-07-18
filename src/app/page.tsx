@@ -153,7 +153,6 @@ export default async function Home() {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background" />
         </div>
         <div className="relative container mx-auto px-4 py-16 sm:py-24">
           <div className="grid md:grid-cols-2 gap-8 items-center">
