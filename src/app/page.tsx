@@ -25,6 +25,7 @@ async function getPopularMovies(): Promise<Movie[]> {
     const file = await fs.readFile(filePath, 'utf-8');
     const movies: Movie[] = JSON.parse(file);
     return [...movies]
+      .filter((movie) => movie.poster_url) // Ensure movie has a poster
       .sort((a, b) => (b.imdb_rating ?? 0) - (a.imdb_rating ?? 0))
       .slice(0, 10);
   } catch (error) {
