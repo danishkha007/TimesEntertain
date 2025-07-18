@@ -18,7 +18,7 @@ interface WatchProvidersProps {
     className?: string;
 }
 
-const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w45';
+const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w92';
 
 const CATEGORY_MAP: { [key in keyof OttPlatformDetails]: string } = {
   flatrate: "Stream",
