@@ -146,14 +146,14 @@ export default async function Home() {
       <section className="relative -mx-4 -mt-8 mb-12 overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://placehold.co/1200x600.png"
+            src="/background.png"
             alt="Hero background"
             fill
             className="object-cover"
-            data-ai-hint="abstract cinematic"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background" />
         </div>
         <div className="relative container mx-auto px-4 py-16 sm:py-24">
           <div className="grid md:grid-cols-2 gap-8 items-center">
