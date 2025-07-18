@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
-import type { Movie, Person, ProductionCompany, Video, WatchProvider } from '@/lib/types';
+import type { Movie, Person, ProductionCompany, Video } from '@/lib/types';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { getProviderLogo, slugify } from '@/lib/utils';
+import { slugify } from '@/lib/utils';
 import type { Metadata } from 'next';
 import {
   Carousel,
@@ -187,21 +187,6 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
   
   const posterUrl = movie.poster_url || "https://placehold.co/400x600.png";
 
-  const uniqueProviders = movie.ott_platforms
-    ? Array.from(new Set(movie.ott_platforms
-        .filter(p => typeof p === 'string' && p.trim() !== '')
-        .map(p => getProviderLogo(p).normalizedName)
-        .filter(name => name !== 'Unknown' && name !== 'Google Play')))
-        .map(normalizedName => {
-          const { logoUrl, link } = getProviderLogo(normalizedName);
-          return {
-            provider_name: normalizedName,
-            provider_logo_url: logoUrl,
-            link: link,
-          };
-        })
-    : [];
-
   return (
     <>
       <script
@@ -249,7 +234,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
 
             <div className="flex items-center gap-4 max-w-sm">
               <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" className="flex-1" />
-              <WatchProviders providers={uniqueProviders} className="flex-1" />
+              <WatchProviders providers={movie.ott_platforms} className="flex-1" />
             </div>
 
 

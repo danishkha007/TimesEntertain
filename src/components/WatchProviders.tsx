@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { WatchProvider } from '@/lib/types';
+import type { OttPlatformDetails, OttProvider } from '@/lib/types';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,16 +10,31 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { PlayCircle } from 'lucide-react';
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { Separator } from './ui/separator';
 
 interface WatchProvidersProps {
-    providers: WatchProvider[];
+    providers?: OttPlatformDetails;
     className?: string;
 }
 
+const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w45';
+
+const CATEGORY_MAP: { [key in keyof OttPlatformDetails]: string } = {
+  flatrate: "Stream",
+  rent: "Rent",
+  buy: "Buy",
+};
+
 export function WatchProviders({ providers, className }: WatchProvidersProps) {
-    if (!providers || providers.length === 0) {
+    if (!providers || Object.keys(providers).length === 0) {
+        return null;
+    }
+
+    const availableCategories = Object.keys(providers)
+        .filter(key => Array.isArray((providers as any)[key]) && (providers as any)[key].length > 0) as (keyof OttPlatformDetails)[];
+
+    if (availableCategories.length === 0) {
         return null;
     }
 
@@ -31,33 +46,29 @@ export function WatchProviders({ providers, className }: WatchProvidersProps) {
                     Watch Now
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-4">
+            <PopoverContent className="w-auto p-0" align="end">
                  <div className="grid gap-4">
-                    <div className="space-y-2">
-                        <h4 className="font-medium leading-none">Available On</h4>
-                        <p className="text-sm text-muted-foreground">
-                            This movie is available on the following platforms.
-                        </p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-4">
-                        {providers.map(provider => (
-                            <Link key={provider.provider_name} href={provider.link} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105" title={provider.provider_name}>
-                                <div className="w-12 h-12 relative rounded-lg overflow-hidden border bg-white flex items-center justify-center">
-                                {provider.provider_logo_url ? (
-                                        <Image
-                                            src={provider.provider_logo_url}
-                                            alt={`${provider.provider_name} logo`}
-                                            fill
-                                            sizes="48px"
-                                            className="object-contain p-1"
-                                        />
-                                ) : (
-                                        <span className="text-xs text-center text-muted-foreground p-1">{provider.provider_name}</span>
-                                )}
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                    {availableCategories.map((categoryKey, index) => (
+                        <div key={categoryKey} className="p-4">
+                            <h4 className="font-medium leading-none mb-4">{CATEGORY_MAP[categoryKey]}</h4>
+                            <div className="flex flex-wrap items-center gap-4">
+                                {(providers[categoryKey] as OttProvider[]).map(provider => (
+                                    <div key={provider.provider_name} className="transition-transform hover:scale-105" title={provider.provider_name}>
+                                        <div className="w-12 h-12 relative rounded-lg overflow-hidden border bg-white flex items-center justify-center">
+                                            <Image
+                                                src={`${TMDB_IMAGE_BASE_URL}${provider.logo_path}`}
+                                                alt={`${provider.provider_name} logo`}
+                                                fill
+                                                sizes="48px"
+                                                className="object-contain p-1"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            {index < availableCategories.length - 1 && <Separator className="mt-4 -mx-4 w-auto" />}
+                        </div>
+                    ))}
                 </div>
             </PopoverContent>
         </Popover>
