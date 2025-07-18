@@ -240,7 +240,6 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             <p className="text-lg mb-6">{movie.overview}</p>
             
             <div className="flex items-center gap-4 max-w-sm">
-                <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" className="flex-1" />
                 {hasProviders && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -254,6 +253,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}
+                <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" className="flex-1" />
             </div>
 
 
