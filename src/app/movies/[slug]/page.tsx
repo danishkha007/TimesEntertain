@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-import { Star } from 'lucide-react';
+import { Star, PlayCircle } from 'lucide-react';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
 import type { Movie, Person, ProductionCompany, Video } from '@/lib/types';
 import { promises as fs } from 'fs';
@@ -22,6 +22,12 @@ import { FullCastDialog } from '@/components/FullCastDialog';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { SimilarMovies } from '@/components/SimilarMovies';
 import { WatchProviders } from '@/components/WatchProviders';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 export async function generateStaticParams() {
   try {
@@ -157,6 +163,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
   }
   
   const topCast = movie.cast?.slice(0, 10) || [];
+  const hasProviders = movie.ott_platforms && Object.values(movie.ott_platforms).some(p => p && p.length > 0);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -231,10 +238,22 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             </div>
             
             <p className="text-lg mb-6">{movie.overview}</p>
-
+            
             <div className="flex items-center gap-4 max-w-sm">
-              <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" className="flex-1" />
-              <WatchProviders providers={movie.ott_platforms} className="flex-1" />
+                <AddToWatchlistButton item={{ id: movie.id, title: movie.title }} type="movies" className="flex-1" />
+                {hasProviders && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                       <Button variant="outline" size="lg" className="flex-1">
+                          <PlayCircle className="mr-2" />
+                          Watch Now
+                       </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-[26rem]" align="start">
+                        <WatchProviders providers={movie.ott_platforms} />
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
             </div>
 
 
