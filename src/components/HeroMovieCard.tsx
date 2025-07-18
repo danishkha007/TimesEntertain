@@ -23,7 +23,7 @@ export function HeroMovieCard({ movie }: HeroMovieCardProps) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-          <h4 className="font-semibold text-sm truncate group-hover:text-primary transition-colors">
+          <h4 className="font-semibold text-sm truncate transition-colors">
             {movie.title}
           </h4>
           <div className="flex items-center gap-1 text-xs text-gray-300">

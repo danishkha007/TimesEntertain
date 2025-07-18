@@ -169,9 +169,11 @@ export default async function Home() {
               </Button>
             </div>
             <div>
-               <h3 className="text-xl font-bold text-foreground mb-4">
-                Highest Rated Movies
-              </h3>
+               <Link href="/movies?sort=vote_average.desc" className="inline-block">
+                <h3 className="text-xl font-bold text-foreground mb-4 hover:text-primary transition-colors">
+                  Highest Rated Movies
+                </h3>
+               </Link>
                <Carousel
                 opts={{
                   align: 'start',
