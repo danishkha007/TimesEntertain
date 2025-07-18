@@ -18,7 +18,7 @@ interface WatchProvidersProps {
     className?: string;
 }
 
-const TMDB_IMAGE_BASE_URL = 'https://media.themoviedb.org/t/p/w92/';
+const TMDB_IMAGE_BASE_URL = 'https://media.themoviedb.org/t/p/original/';
 
 const CATEGORY_MAP: { [key in keyof OttPlatformDetails]: string } = {
   flatrate: "Stream",
@@ -46,10 +46,10 @@ export function WatchProviders({ providers, className }: WatchProvidersProps) {
                     Watch Now
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-                 <div className="grid gap-4">
+            <PopoverContent className="w-80 p-0" align="end">
+                 <div className="grid p-4 gap-2">
                     {availableCategories.map((categoryKey, index) => (
-                        <div key={categoryKey} className="p-4">
+                        <div key={categoryKey}>
                             <h4 className="font-medium leading-none mb-4">{CATEGORY_MAP[categoryKey]}</h4>
                             <div className="flex flex-wrap items-center gap-4">
                                 {(providers[categoryKey] as OttProvider[]).map(provider => (
