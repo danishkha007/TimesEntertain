@@ -46,7 +46,7 @@ export function WatchProviders({ providers, className }: WatchProvidersProps) {
                     Watch Now
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-96 p-0" align="end">
+            <PopoverContent className="w-[26rem] p-0" align="end">
                  <div className="grid p-4 gap-2">
                     {availableCategories.map((categoryKey, index) => (
                         <div key={categoryKey}>
