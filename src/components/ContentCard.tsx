@@ -8,19 +8,23 @@ import { Star } from 'lucide-react';
 import { Badge } from './ui/badge';
 
 interface ContentCardProps {
-  item: Movie | TVShow | (Partial<Movie> & { itemType?: 'movies' | 'tv' });
+  item: Partial<Movie> & Partial<TVShow> & { itemType?: 'movies' | 'tv' };
   type: 'movies' | 'tv';
   className?: string;
 }
 
 export function ContentCard({ item, type, className }: ContentCardProps) {
+  if (!item || !item.title) {
+    return null; // or a fallback component
+  }
+  
   const slug = item.slug ?? slugify(item.title);
   
-  let itemPosterUrl = ('poster_url' in item ? item.poster_url : undefined) || 'https://placehold.co/400x600.png';
+  const itemPosterUrl = item.poster_url || 'https://placehold.co/400x600.png';
   
   const year = 'release_date' in item && item.release_date ? new Date(item.release_date).getFullYear() : ('year' in item ? item.year : '');
-  const rating = 'imdb_rating' in item ? item.imdb_rating : ('rating' in item ? item.rating : 0);
-  const genres = 'genres' in item ? item.genres : ('genre' in item ? item.genre : []);
+  const rating = item.imdb_rating;
+  const genres = item.genres || [];
 
 
   return (
