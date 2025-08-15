@@ -16,10 +16,7 @@ interface ContentCardProps {
 export function ContentCard({ item, type, className }: ContentCardProps) {
   const slug = item.slug ?? slugify(item.title);
   
-  let itemPosterUrl = 'poster_url' in item ? item.poster_url : ('posterUrl' in item ? item.posterUrl : 'https://placehold.co/400x600.png');
-  if (!itemPosterUrl) {
-    itemPosterUrl = 'https://placehold.co/400x600.png';
-  }
+  let itemPosterUrl = ('poster_url' in item ? item.poster_url : undefined) || 'https://placehold.co/400x600.png';
   
   const year = 'release_date' in item && item.release_date ? new Date(item.release_date).getFullYear() : ('year' in item ? item.year : '');
   const rating = 'imdb_rating' in item ? item.imdb_rating : ('rating' in item ? item.rating : 0);

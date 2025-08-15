@@ -41,8 +41,7 @@ export function useWatchlist() {
       
       const itemToAdd: WatchlistItem = {
           ...item,
-          poster_url: 'poster_url' in item ? item.poster_url : undefined,
-          posterUrl: 'posterUrl' in item ? item.posterUrl : undefined,
+          poster_url: 'poster_url' in item ? item.poster_url : ('posterUrl' in item ? item.posterUrl : undefined),
           genres: 'genres' in item ? item.genres : ('genre' in item ? item.genre : []),
           imdb_rating: 'imdb_rating' in item ? item.imdb_rating : ('rating' in item ? item.rating : 0),
           itemType: type,
