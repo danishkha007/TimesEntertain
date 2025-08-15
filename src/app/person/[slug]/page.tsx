@@ -1,3 +1,4 @@
+
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { promises as fs } from 'fs';
@@ -57,9 +58,17 @@ async function getPersonData(slug: string): Promise<{ person: Person; movies: Mo
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const data = await getPersonData(params.slug);
 
+  const noIndexMeta = {
+    robots: {
+      index: false,
+      follow: true,
+    },
+  };
+
   if (!data?.person) {
     return {
       title: 'Person Not Found',
+      ...noIndexMeta,
     };
   }
 
@@ -68,6 +77,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: data.person.name,
     description: `Explore the filmography of ${data.person.name}.`,
+    ...noIndexMeta,
     openGraph: {
       title: data.person.name,
       description: `Filmography of ${data.person.name}.`,
