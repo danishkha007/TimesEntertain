@@ -8,6 +8,7 @@ import type { Metadata } from 'next';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
 import { slugify } from '@/lib/utils';
 import Link from 'next/link';
+import type { TVShow } from '@/lib/types';
 
 type Props = {
   params: { slug: string };
@@ -19,8 +20,21 @@ export async function generateStaticParams() {
   }));
 }
 
+function getShow(slug: string): TVShow | undefined {
+    const show = tvShows.find((m) => m.slug === slug);
+    if (!show) return undefined;
+
+    // This makes sure the hover card works correctly
+    return {
+        ...show,
+        genres: show.genre,
+        imdb_rating: show.rating,
+    }
+}
+
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const show = tvShows.find((m) => m.slug === params.slug);
+  const show = getShow(params.slug);
 
   if (!show) {
     return {
@@ -59,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function TvShowDetailPage({ params }: Props) {
-  const show = tvShows.find((m) => m.slug === params.slug);
+  const show = getShow(params.slug);
 
   if (!show) {
     notFound();
@@ -134,7 +148,7 @@ export default function TvShowDetailPage({ params }: Props) {
             
             <p className="text-lg mb-6">{show.synopsis}</p>
 
-            <AddToWatchlistButton item={{id: show.id, title: show.title}} type="tv" />
+            <AddToWatchlistButton item={show} type="tv" />
           </div>
         </div>
 

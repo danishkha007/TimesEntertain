@@ -32,13 +32,20 @@ export function useWatchlist() {
     }
   }, [watchlist, isLoaded]);
 
-  const addToWatchlist = useCallback((item: {id: number, title: string}, type: 'movies' | 'tv') => {
+  const addToWatchlist = useCallback((item: Partial<Movie> & Partial<TVShow> & {id: number, title: string}, type: 'movies' | 'tv') => {
     setWatchlist((prev) => {
       if (prev.some((i) => i.id === item.id && i.itemType === type)) {
         return prev;
       }
       const slug = slugify(item.title);
-      return [...prev, { ...item, itemType: type, slug }];
+      
+      const itemToAdd: WatchlistItem = {
+          ...item,
+          itemType: type,
+          slug,
+      }
+      
+      return [...prev, itemToAdd];
     });
   }, []);
 

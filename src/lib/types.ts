@@ -1,3 +1,4 @@
+
 export interface Role {
   movie_id: number;
   character: string;
@@ -84,4 +85,7 @@ export interface TVShow extends ContentItem {
   slug: string;
   cast: { name: string; role: string }[];
   director: string;
+  // For consistency with movie card hover
+  genres?: string[];
+  imdb_rating?: number;
 }

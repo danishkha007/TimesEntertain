@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 interface AddToWatchlistButtonProps {
-  item: { id: number; title: string };
+  item: Partial<Movie> & Partial<TVShow> & { id: number; title: string };
   type: 'movies' | 'tv';
   className?: string;
 }
