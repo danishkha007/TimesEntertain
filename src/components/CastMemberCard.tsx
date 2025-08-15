@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import type { Person } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,7 +14,7 @@ export function CastMemberCard({ actor }: CastMemberCardProps) {
   
   return (
     <Link href={`/person/${slugify(actor.name)}`} className="block group h-full">
-      <Card className="overflow-hidden h-full transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
+      <Card className="overflow-hidden h-full transition-all duration-300 group-hover:shadow-lg">
         <CardContent className="p-0 flex flex-col h-full">
           <div className="aspect-[2/3] relative">
             <Image
