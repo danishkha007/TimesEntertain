@@ -8,21 +8,6 @@ import type { Person, Movie } from '@/lib/types';
 import type { Metadata } from 'next';
 import { ContentGrid } from '@/components/ContentGrid';
 
-export async function generateStaticParams() {
-  try {
-    const filePath = path.join(process.cwd(), 'public/persons.json');
-    const file = await fs.readFile(filePath, 'utf-8');
-    const persons: Person[] = JSON.parse(file);
-
-    return persons.map((person) => ({
-      slug: slugify(person.name),
-    }));
-  } catch (error) {
-    console.error('Error generating static params for persons:', error);
-    return [];
-  }
-}
-
 async function getPersonData(slug: string): Promise<{ person: Person; movies: Movie[] } | null> {
   try {
     const personFilePath = path.join(process.cwd(), 'public/persons.json');

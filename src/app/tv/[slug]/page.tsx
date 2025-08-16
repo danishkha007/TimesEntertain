@@ -14,12 +14,6 @@ type Props = {
   params: { slug: string };
 };
 
-export async function generateStaticParams() {
-  return tvShows.map((show) => ({
-    slug: show.slug,
-  }));
-}
-
 function getShow(slug: string): TVShow | undefined {
     const show = tvShows.find((m) => m.slug === slug);
     if (!show) return undefined;

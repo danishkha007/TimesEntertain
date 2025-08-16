@@ -29,21 +29,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 
-export async function generateStaticParams() {
-  try {
-    const filePath = path.join(process.cwd(), 'public/movies.json');
-    const file = await fs.readFile(filePath, 'utf-8');
-    const movies: Movie[] = JSON.parse(file);
-
-    return movies.map((movie) => ({
-      slug: slugify(movie.title),
-    }));
-  } catch (error) {
-    console.error('Error generating static params for movies:', error);
-    return [];
-  }
-}
-
 async function getMovieData(slug: string): Promise<Movie | null> {
     try {
         const movieFilePath = path.join(process.cwd(), 'public/movies.json');

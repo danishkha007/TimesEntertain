@@ -1,3 +1,4 @@
+
 import { notFound } from 'next/navigation';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -5,31 +6,6 @@ import { slugify } from '@/lib/utils';
 import type { Movie } from '@/lib/types';
 import { ContentGrid } from '@/components/ContentGrid';
 import type { Metadata } from 'next';
-
-async function getAllGenres(): Promise<string[]> {
-  try {
-    const filePath = path.join(process.cwd(), 'public/movies.json');
-    const file = await fs.readFile(filePath, 'utf-8');
-    const movies: Movie[] = JSON.parse(file);
-    const allGenres = new Set<string>();
-    movies.forEach(movie => {
-      movie.genres.forEach(genre => {
-        allGenres.add(genre);
-      });
-    });
-    return Array.from(allGenres);
-  } catch (error) {
-    console.error('Error fetching genres:', error);
-    return [];
-  }
-}
-
-export async function generateStaticParams() {
-  const genres = await getAllGenres();
-  return genres.map((genre) => ({
-    slug: slugify(genre),
-  }));
-}
 
 async function getMoviesByGenre(genreSlug: string): Promise<{ movies: Movie[], genreName: string | null }> {
   try {
