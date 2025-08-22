@@ -10,7 +10,7 @@ interface CastMemberCardProps {
 }
 
 export function CastMemberCard({ actor }: CastMemberCardProps) {
-  const imageUrl = actor.profile_url || "https://placehold.co/400x600.png";
+  const imageUrl = actor.profile_path ? `${process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL}w500${actor.profile_path}` : "https://placehold.co/400x600.png";
   
   return (
     <Link href={`/person/${slugify(actor.name)}`} className="block group h-full">

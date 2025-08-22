@@ -15,20 +15,16 @@ interface VideoPlayerProps {
 }
 
 const getEmbedUrl = (video: Video) => {
-    if (!video || !video.key) return null;
+    if (!video || !video.key_id) return null;
     if (video.site === 'YouTube') {
-        return `https://www.youtube.com/embed/${video.key}`;
-    }
-    if (video.url && video.url.includes('youtube.com/watch?v=')) {
-        const key = video.url.split('v=')[1];
-        return `https://www.youtube.com/embed/${key}`;
+        return `https://www.youtube.com/embed/${video.key_id}`;
     }
     return video.url; // Fallback
 };
 
 const getThumbnailUrl = (video: Video) => {
-    if (video.site === 'YouTube' && video.key) {
-      return `https://img.youtube.com/vi/${video.key}/mqdefault.jpg`;
+    if (video.site === 'YouTube' && video.key_id) {
+      return `https://img.youtube.com/vi/${video.key_id}/mqdefault.jpg`;
     }
     return null;
   };
@@ -65,7 +61,7 @@ export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
             <>
               <div className="aspect-video mb-2 bg-black rounded-lg">
                 <iframe
-                  key={selectedVideo.key} // Add key to force re-render
+                  key={selectedVideo.key_id} // Add key to force re-render
                   src={selectedEmbedUrl}
                   title={selectedVideo.name}
                   className="w-full h-full rounded-lg"
@@ -92,11 +88,11 @@ export function VideoPlayer({ videos, movieTitle }: VideoPlayerProps) {
                 const thumbnailUrl = getThumbnailUrl(video);
                 return (
                     <button
-                    key={video.key || video.url}
+                    key={video.key_id || video.url}
                     onClick={() => setSelectedVideo(video)}
                     className={cn(
                         "flex items-center gap-4 p-3 text-left transition-colors w-full",
-                        selectedVideo?.key === video.key ? "bg-accent" : "hover:bg-accent/50",
+                        selectedVideo?.key_id === video.key_id ? "bg-accent" : "hover:bg-accent/50",
                         index !== 0 && "border-t"
                     )}
                     >

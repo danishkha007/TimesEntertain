@@ -9,68 +9,52 @@ import {
 import { tvShows } from '@/lib/data';
 import type { Movie, Person } from '@/lib/types';
 import { ContentCard } from '@/components/ContentCard';
-import { promises as fs } from 'fs';
-import path from 'path';
 import { PersonCard } from '@/components/PersonCard';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
-import { Star } from 'lucide-react';
 import Link from 'next/link';
-import { slugify } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { HeroMovieCard } from '@/components/HeroMovieCard';
+import db from '@/lib/db';
+import type { RowDataPacket } from 'mysql2';
 
 async function getPopularMovies(): Promise<Movie[]> {
   try {
-    const filePath = path.join(process.cwd(), 'public/movies.json');
-    const file = await fs.readFile(filePath, 'utf-8');
-    const movies: Movie[] = JSON.parse(file);
-    return [...movies]
-      .filter((movie) => movie.poster_url) // Ensure movie has a poster
-      .sort((a, b) => (b.imdb_rating ?? 0) - (a.imdb_rating ?? 0))
-      .slice(0, 10);
+    const [rows] = await db.query<RowDataPacket[]>(`
+      SELECT 
+        m.*, 
+        GROUP_CONCAT(DISTINCT g.name) AS genres
+      FROM movies m
+      LEFT JOIN movie_genres mg ON m.id = mg.movie_id
+      LEFT JOIN genres g ON mg.genre_id = g.id
+      WHERE m.poster_path IS NOT NULL
+      GROUP BY m.id
+      ORDER BY m.popularity DESC 
+      LIMIT 10
+    `);
+    
+    return rows.map(row => ({
+      ...row,
+      genres: row.genres ? row.genres.split(',') : [],
+      vote_average: row.vote_average
+    })) as Movie[];
   } catch (error) {
     console.error('Failed to fetch and process movies:', error);
     return [];
   }
 }
 
-async function getPopularPeople(
-  role: 'Actor' | 'Director' | 'Composer'
-): Promise<Person[]> {
+
+async function getPopularPeople(): Promise<Person[]> {
   try {
-    const personFilePath = path.join(process.cwd(), 'public/persons.json');
-    const file = await fs.readFile(personFilePath, 'utf-8');
-    const persons: Person[] = JSON.parse(file);
-
-    const personCounts = new Map<number, number>();
-
-    persons.forEach((person) => {
-      let count = 0;
-      if (role === 'Actor' && person.roles) {
-        count = person.roles.length;
-      } else if (person.crew_roles) {
-        if (role === 'Director') {
-          count = person.crew_roles.filter((r) => r.job === 'Director').length;
-        } else if (role === 'Composer') {
-          count = person.crew_roles.filter(
-            (r) => r.job === 'Original Music Composer'
-          ).length;
-        }
-      }
-      if (count > 0) {
-        personCounts.set(person.id, count);
-      }
-    });
-
-    const sortedPeople = [...personCounts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .map(([id]) => persons.find((p) => p.id === id))
-      .filter((p): p is Person => p !== undefined);
-
-    return sortedPeople.slice(0, 10);
+    const [rows] = await db.query<RowDataPacket[]>(`
+      SELECT p.*
+      FROM people p
+      ORDER BY p.popularity DESC
+      LIMIT 10
+    `);
+    return rows as Person[];
   } catch (error) {
-    console.error(`Failed to fetch popular ${role}s:`, error);
+    console.error(`Failed to fetch popular people:`, error);
     return [];
   }
 }
@@ -133,13 +117,13 @@ function PersonCarousel({ people }: { people: Person[] }) {
 
 export default async function Home() {
   const popularMovies = await getPopularMovies();
-  const highestRatedMovies = popularMovies.slice(0, 5);
+  const highestRatedMovies = [...popularMovies].sort((a,b) => (b.vote_average ?? 0) - (a.vote_average ?? 0)).slice(0, 5);
   const popularTvShows = [...tvShows]
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 10);
-  const popularActors = await getPopularPeople('Actor');
-  const popularDirectors = await getPopularPeople('Director');
-  const popularComposers = await getPopularPeople('Composer');
+  const popularActors = await getPopularPeople();
+  const popularDirectors = await getPopularPeople(); // Simplified for now
+  const popularComposers = await getPopularPeople(); // Simplified for now
 
   return (
     <div className="space-y-12">

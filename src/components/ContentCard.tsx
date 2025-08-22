@@ -20,11 +20,13 @@ export function ContentCard({ item, type, className }: ContentCardProps) {
   
   const slug = item.slug ?? slugify(item.title);
   
-  const itemPosterUrl = item.poster_url || 'https://placehold.co/400x600.png';
-  
+  const itemPosterUrl = item.poster_path 
+    ? `${process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL}w500${item.poster_path}`
+    : (item.posterUrl || 'https://placehold.co/400x600.png');
+
   const year = 'release_date' in item && item.release_date ? new Date(item.release_date).getFullYear() : ('year' in item ? item.year : '');
-  const rating = item.imdb_rating;
-  const genres = item.genres || [];
+  const rating = 'vote_average' in item ? item.vote_average : item.rating;
+  const genres = 'genres' in item && item.genres ? item.genres : ('genre' in item ? item.genre : []);
 
 
   return (

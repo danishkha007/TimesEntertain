@@ -10,11 +10,13 @@ interface HeroMovieCardProps {
 }
 
 export function HeroMovieCard({ movie }: HeroMovieCardProps) {
+  const posterUrl = movie.poster_path ? `${process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL}w500${movie.poster_path}` : 'https://placehold.co/400x600.png';
+
   return (
     <Link href={`/movies/${slugify(movie.title)}`} className="block group">
       <div className="relative aspect-[2/3] overflow-hidden rounded-lg">
         <Image
-          src={movie.poster_url}
+          src={posterUrl}
           alt={`Poster for ${movie.title}`}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -28,7 +30,7 @@ export function HeroMovieCard({ movie }: HeroMovieCardProps) {
           </h4>
           <div className="flex items-center gap-1 text-xs text-gray-300">
             <Star className="w-3 h-3 text-yellow-400 fill-current" />
-            <span>{movie.imdb_rating?.toFixed(1)}</span>
+            <span>{movie.vote_average?.toFixed(1)}</span>
           </div>
         </div>
       </div>

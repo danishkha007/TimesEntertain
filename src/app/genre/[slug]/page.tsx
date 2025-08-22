@@ -1,29 +1,34 @@
 
 import { notFound } from 'next/navigation';
-import { promises as fs } from 'fs';
-import path from 'path';
 import { slugify } from '@/lib/utils';
 import type { Movie } from '@/lib/types';
 import { ContentGrid } from '@/components/ContentGrid';
 import type { Metadata } from 'next';
+import db from '@/lib/db';
+import type { RowDataPacket } from 'mysql2';
 
 async function getMoviesByGenre(genreSlug: string): Promise<{ movies: Movie[], genreName: string | null }> {
   try {
-    const filePath = path.join(process.cwd(), 'public/movies.json');
-    const file = await fs.readFile(filePath, 'utf-8');
-    const allMovies: Movie[] = JSON.parse(file);
-    
-    let genreName: string | null = null;
-    
-    const movies = allMovies.filter(movie => {
-      return movie.genres.some(genre => {
-        if (slugify(genre) === genreSlug) {
-          genreName = genre;
-          return true;
-        }
-        return false;
-      });
-    });
+    const [genreRows] = await db.query<RowDataPacket[]>("SELECT name FROM genres WHERE ? = (SELECT slugify(name)) LIMIT 1", [genreSlug]);
+    if (genreRows.length === 0) {
+      return { movies: [], genreName: null };
+    }
+    const genreName = genreRows[0].name;
+
+    const [movieRows] = await db.query<RowDataPacket[]>(`
+        SELECT m.*, GROUP_CONCAT(g.name) as genres
+        FROM movies m
+        JOIN movie_genres mg ON m.id = mg.movie_id
+        JOIN genres g ON mg.genre_id = g.id
+        WHERE g.name = ?
+        GROUP BY m.id
+        ORDER BY m.popularity DESC
+    `, [genreName]);
+
+    const movies = movieRows.map(row => ({
+        ...row,
+        genres: row.genres ? row.genres.split(',') : [],
+    })) as Movie[];
 
     return { movies, genreName };
   } catch (error) {

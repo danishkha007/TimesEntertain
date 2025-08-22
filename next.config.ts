@@ -37,6 +37,9 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  env: {
+    NEXT_PUBLIC_TMDB_IMAGE_BASE_URL: process.env.TMDB_IMAGE_BASE_URL,
+  }
 };
 
 export default nextConfig;

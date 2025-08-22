@@ -1,6 +1,4 @@
-import type { Movie, Person } from '@/lib/types';
-import { promises as fs } from 'fs';
-import path from 'path';
+import type { Movie } from '@/lib/types';
 import {
     Carousel,
     CarouselContent,
@@ -9,45 +7,36 @@ import {
     CarouselPrevious,
 } from '@/components/ui/carousel';
 import { ContentCard } from '@/components/ContentCard';
+import db from '@/lib/db';
+import type { RowDataPacket } from 'mysql2';
 
 interface SimilarMoviesProps {
     currentMovieId: number;
-    cast: (Person & { character?: string })[];
+    castIds: number[];
 }
 
-async function getSimilarMovies(currentMovieId: number, cast: (Person & { character?: string })[]): Promise<Movie[]> {
+async function getSimilarMovies(currentMovieId: number, castIds: number[]): Promise<Movie[]> {
+    if (castIds.length === 0) return [];
     try {
-        const filePath = path.join(process.cwd(), 'public/movies.json');
-        const file = await fs.readFile(filePath, 'utf-8');
-        const allMovies: Movie[] = JSON.parse(file);
+        const placeholders = castIds.map(() => '?').join(',');
+        const params = [currentMovieId, ...castIds];
 
-        const similarMoviesMap = new Map<number, Movie>();
-        const castIds = cast.map(c => c.id);
-
-        allMovies.forEach(movie => {
-            if (movie.id === currentMovieId) return;
-
-            const hasSimilarCast = movie.cast_ids.some(castId => castIds.includes(castId));
-
-            if (hasSimilarCast) {
-                similarMoviesMap.set(movie.id, movie);
-            }
-        });
-
-        // Order similar movies based on the original cast order
-        const orderedSimilarMovies: Movie[] = [];
-        const addedMovieIds = new Set<number>();
+        const [rows] = await db.query<RowDataPacket[]>(`
+            SELECT DISTINCT m.*, GROUP_CONCAT(g.name) as genres
+            FROM movies m
+            JOIN movie_cast mc ON m.id = mc.movie_id
+            LEFT JOIN movie_genres mg ON m.id = mg.movie_id
+            LEFT JOIN genres g ON mg.genre_id = g.id
+            WHERE m.id != ? AND mc.person_id IN (${placeholders})
+            GROUP BY m.id
+            ORDER BY m.popularity DESC
+            LIMIT 10
+        `, params);
         
-        cast.forEach(actor => {
-            allMovies.forEach(movie => {
-                if (movie.id !== currentMovieId && movie.cast_ids.includes(actor.id) && !addedMovieIds.has(movie.id)) {
-                    orderedSimilarMovies.push(movie);
-                    addedMovieIds.add(movie.id);
-                }
-            })
-        });
-
-        return orderedSimilarMovies;
+        return rows.map(row => ({
+            ...row,
+            genres: row.genres ? row.genres.split(',') : [],
+        })) as Movie[];
 
     } catch (error) {
         console.error('Error fetching similar movies:', error);
@@ -55,8 +44,8 @@ async function getSimilarMovies(currentMovieId: number, cast: (Person & { charac
     }
 }
 
-export async function SimilarMovies({ currentMovieId, cast }: SimilarMoviesProps) {
-    const similarMovies = await getSimilarMovies(currentMovieId, cast);
+export async function SimilarMovies({ currentMovieId, castIds }: SimilarMoviesProps) {
+    const similarMovies = await getSimilarMovies(currentMovieId, castIds);
 
     if (similarMovies.length === 0) {
         return null;

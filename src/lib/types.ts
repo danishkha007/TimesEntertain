@@ -13,7 +13,7 @@ export interface CrewRole {
 export interface Person {
   id: number;
   name: string;
-  profile_url?: string | null;
+  profile_path?: string | null;
   roles?: Role[];
   crew_roles?: CrewRole[];
   character?: string; // Added for convenience after joining
@@ -22,13 +22,13 @@ export interface Person {
 export interface ProductionCompany {
   id: number;
   name: string;
-  logo_url: string | null;
+  logo_path: string | null;
   origin_country: string;
 }
 
 export interface Video {
   name: string;
-  key: string;
+  key_id: string;
   site: string;
   type: string;
   official: boolean;
@@ -57,21 +57,26 @@ export interface Movie extends ContentItem {
   overview: string;
   release_date: string;
   genres: string[];
-  poster_url: string;
-  imdb_rating?: number;
+  poster_path: string;
+  vote_average?: number;
   vote_count: number;
-  cast_ids: number[];
-  crew_ids: number[];
-  production_company_ids: number[];
-  videos?: Video[];
-  ott_platforms?: OttPlatformDetails;
-
-  // Populated fields
+  
+  // These are from joins and might not always be present
   cast?: (Person & { character?: string })[];
   director?: Person;
   writers?: Person[];
   composers?: Person[];
   production?: ProductionCompany[];
+  videos?: Video[];
+  ott_platforms?: OttPlatformDetails;
+
+  // Fields from DB that might not have been in original types
+  backdrop_path?: string;
+  imdb_id?: string;
+  tagline?: string;
+  runtime?: number;
+  revenue?: number;
+  budget?: number;
 }
 
 export interface TVShow extends ContentItem {

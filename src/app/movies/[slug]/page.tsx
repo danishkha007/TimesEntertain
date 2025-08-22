@@ -6,8 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Star, PlayCircle } from 'lucide-react';
 import AddToWatchlistButton from '@/components/AddToWatchlistButton';
 import type { Movie, Person, ProductionCompany, Video } from '@/lib/types';
-import { promises as fs } from 'fs';
-import path from 'path';
 import { slugify } from '@/lib/utils';
 import type { Metadata } from 'next';
 import {
@@ -28,56 +26,69 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import db from '@/lib/db';
+import type { RowDataPacket } from 'mysql2';
 
 async function getMovieData(slug: string): Promise<Movie | null> {
     try {
-        const movieFilePath = path.join(process.cwd(), 'public/movies.json');
-        const personFilePath = path.join(process.cwd(), 'public/persons.json');
-        const productionFilePath = path.join(process.cwd(), 'public/production.json');
-        
-        const [moviesFile, personsFile, productionsFile] = await Promise.all([
-            fs.readFile(movieFilePath, 'utf-8'),
-            fs.readFile(personFilePath, 'utf-8'),
-            fs.readFile(productionFilePath, 'utf-8'),
-        ]);
+        const [movieRows] = await db.query<RowDataPacket[]>(`
+            SELECT m.*, 
+                   GROUP_CONCAT(DISTINCT g.name) AS genres
+            FROM movies m
+            LEFT JOIN movie_genres mg ON m.id = mg.movie_id
+            LEFT JOIN genres g ON mg.genre_id = g.id
+            WHERE ? = (SELECT slugify(m.title))
+            GROUP BY m.id
+            LIMIT 1
+        `, [slug]);
 
-        const movies: Movie[] = JSON.parse(moviesFile);
-        const persons: Person[] = JSON.parse(personsFile);
-        const productions: ProductionCompany[] = JSON.parse(productionsFile);
-        
-        const movie = movies.find((m) => slugify(m.title) === slug);
+        if (movieRows.length === 0) return null;
 
-        if (!movie) {
-            return null;
-        }
+        let movie: Movie = {
+            ...movieRows[0],
+            genres: movieRows[0].genres ? movieRows[0].genres.split(',') : [],
+            release_date: new Date(movieRows[0].release_date).toISOString(),
+            vote_average: movieRows[0].vote_average
+        } as Movie;
 
-        const director = persons.find(p => 
-            p.crew_roles?.some(role => role.movie_id === movie.id && role.job === 'Director')
-        );
+        // Fetch Cast
+        const [castRows] = await db.query<RowDataPacket[]>(`
+            SELECT p.*, mc.character_name as 'character'
+            FROM movie_cast mc
+            JOIN people p ON mc.person_id = p.id
+            WHERE mc.movie_id = ?
+            ORDER BY mc.cast_order ASC
+        `, [movie.id]);
+        movie.cast = castRows as (Person & { character?: string })[];
 
-        const writers = persons.filter(p =>
-            movie.crew_ids.includes(p.id) &&
-            p.crew_roles?.some(role => role.movie_id === movie.id && role.department === 'Writing')
-        );
+        // Fetch Director, Writers, Composers
+        const [crewRows] = await db.query<RowDataPacket[]>(`
+            SELECT p.*, mc.job
+            FROM movie_crew mc
+            JOIN people p ON mc.person_id = p.id
+            WHERE mc.movie_id = ? AND mc.job IN ('Director', 'Writer', 'Screenplay', 'Original Music Composer')
+        `, [movie.id]);
 
-        const composers = persons.filter(p =>
-            movie.crew_ids.includes(p.id) &&
-            p.crew_roles?.some(role => role.movie_id === movie.id && role.job === 'Original Music Composer')
-        );
+        movie.director = crewRows.find(c => c.job === 'Director') as Person;
+        movie.writers = crewRows.filter(c => c.job === 'Writer' || c.job === 'Screenplay') as Person[];
+        movie.composers = crewRows.filter(c => c.job === 'Original Music Composer') as Person[];
 
-        const cast = movie.cast_ids
-            .map(id => {
-                const person = persons.find(p => p.id === id);
-                if (!person) return null;
+        // Fetch Production Companies
+        const [companyRows] = await db.query<RowDataPacket[]>(`
+            SELECT pc.*
+            FROM movie_production_companies mpc
+            JOIN production_companies pc ON mpc.company_id = pc.id
+            WHERE mpc.movie_id = ?
+        `, [movie.id]);
+        movie.production = companyRows as ProductionCompany[];
 
-                const role = person.roles?.find(r => r.movie_id === movie.id);
-                return { ...person, character: role?.character };
-            })
-            .filter(Boolean) as (Person & { character?: string })[];
-        
-        const production = movie.production_company_ids.map(id => productions.find(p => p.id === id)).filter(Boolean) as ProductionCompany[];
-        
-        return { ...movie, director, cast, writers, composers, production };
+        // Fetch Videos
+        const [videoRows] = await db.query<RowDataPacket[]>(`
+            SELECT * FROM videos WHERE entity_type = 'movie' AND entity_id = ?
+        `, [movie.id]);
+        movie.videos = videoRows as Video[];
+
+        return movie;
 
     } catch (error) {
         console.error('Error fetching movie data:', error);
@@ -96,7 +107,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
   }
 
-  const imageUrl = movie.poster_url || 'https://placehold.co/400x600.png';
+  const imageUrl = movie.poster_path ? `${process.env.TMDB_IMAGE_BASE_URL}w500${movie.poster_path}` : 'https://placehold.co/400x600.png';
   const year = getYear(movie.release_date);
   const title = `${movie.title} (${year}) | Movie Details, Cast & Reviews`;
   const description = `Explore details for the movie ${movie.title} (${year}). Find cast information, director, user reviews, ratings, where to watch, and watch official trailers. Your ultimate guide to ${movie.title}.`;
@@ -128,14 +139,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 
 const getEmbedUrl = (video: Video) => {
-    if (!video || !video.key) return null;
+    if (!video || !video.key_id) return null;
     if (video.site === 'YouTube') {
-        return `https://www.youtube.com/embed/${video.key}`;
-    }
-    // Attempt to parse other video URLs, might need more robust logic
-    if (video.url && video.url.includes('youtube.com/watch?v=')) {
-        const key = video.url.split('v=')[1];
-        return `https://www.youtube.com/embed/${key}`;
+        return `https://www.youtube.com/embed/${video.key_id}`;
     }
     return video.url; // Fallback
 };
@@ -155,7 +161,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
     '@type': 'Movie',
     name: movie.title,
     datePublished: movie.release_date,
-    image: movie.poster_url,
+    image: movie.poster_path ? `${process.env.TMDB_IMAGE_BASE_URL}w500${movie.poster_path}` : '',
     description: movie.overview,
     director: movie.director ? {
       '@type': 'Person',
@@ -169,15 +175,15 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
       '@type': 'Organization',
       name: p.name,
     })),
-    aggregateRating: movie.imdb_rating ? {
+    aggregateRating: movie.vote_average ? {
       '@type': 'AggregateRating',
-      ratingValue: movie.imdb_rating?.toString(),
+      ratingValue: movie.vote_average?.toString(),
       bestRating: '10',
       ratingCount: movie.vote_count.toString(), 
     } : undefined,
   };
   
-  const posterUrl = movie.poster_url || "https://placehold.co/400x600.png";
+  const posterUrl = movie.poster_path ? `${process.env.TMDB_IMAGE_BASE_URL}w500${movie.poster_path}` : "https://placehold.co/400x600.png";
 
   return (
     <>
@@ -207,10 +213,10 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
             )}
 
             <div className="flex items-center gap-4 mb-6">
-            {movie.imdb_rating && (
+            {movie.vote_average && (
               <div className="flex items-center gap-1 text-lg font-bold">
                 <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                <span>{movie.imdb_rating?.toFixed(1)}</span>
+                <span>{movie.vote_average?.toFixed(1)}</span>
               </div>
             )}
               <div className="flex flex-wrap gap-2">
@@ -304,7 +310,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
         )}
 
         {movie.cast && movie.cast.length > 0 && (
-          <SimilarMovies currentMovieId={movie.id} cast={movie.cast} />
+          <SimilarMovies currentMovieId={movie.id} castIds={movie.cast.map(c => c.id)} />
         )}
       </article>
     </>

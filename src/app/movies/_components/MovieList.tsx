@@ -33,7 +33,7 @@ export function MovieList({ movies }: MovieListProps) {
         filtered.sort((a, b) => new Date(a.release_date).getTime() - new Date(b.release_date).getTime());
         break;
       case 'vote_average.desc':
-        filtered.sort((a, b) => (b.imdb_rating || 0) - (a.imdb_rating || 0));
+        filtered.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
         break;
       case 'popularity.desc':
       default:

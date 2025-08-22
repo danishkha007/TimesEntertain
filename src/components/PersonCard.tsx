@@ -12,7 +12,7 @@ interface PersonCardProps {
 }
 
 export function PersonCard({ person, className }: PersonCardProps) {
-  const imageUrl = person.profile_url || "https://placehold.co/400x600.png";
+  const imageUrl = person.profile_path ? `${process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL}w500${person.profile_path}` : "https://placehold.co/400x600.png";
   
   return (
     <Link href={`/person/${slugify(person.name)}`} className="block group">

@@ -1,71 +1,72 @@
+
 "use client";
 
 import { useSearchParams } from 'next/navigation';
 import { ContentGrid } from "@/components/ContentGrid";
 import { tvShows } from "@/lib/data";
 import { useEffect, useState } from 'react';
-import type { Movie, Person } from '@/lib/types';
+import type { Movie } from '@/lib/types';
+
+// Debounce function
+function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
+  let timeout: NodeJS.Timeout;
+  return (...args: Parameters<F>): Promise<ReturnType<F>> =>
+    new Promise(resolve => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => resolve(func(...args)), waitFor);
+    });
+}
+
+// NOTE: This component is now responsible for its own data fetching.
+// In a larger app, you might move this to a server action or API route.
+async function fetchSearchResults(query: string): Promise<{ movies: Movie[], tvShows: any[] }> {
+    if (!query) return { movies: [], tvShows: [] };
+    
+    // This is a simplified search. A real implementation would use Full-Text Search
+    // on more fields and be more sophisticated.
+    const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+    if (!res.ok) {
+        console.error("Search failed");
+        return { movies: [], tvShows: [] };
+    }
+    return res.json();
+}
+
+const debouncedFetch = debounce(fetchSearchResults, 300);
+
 
 export default function SearchResults() {
   const searchParams = useSearchParams();
-  const q = searchParams.get('q');
-  const [query, setQuery] = useState(q || '');
-
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
-  const [filteredTvShows, setFilteredTvShows] = useState<any[]>([]);
+  const q = searchParams.get('q') || '';
+  const [query, setQuery] = useState(q);
+  const [isLoading, setIsLoading] = useState(false);
+  const [results, setResults] = useState<{ movies: Movie[], tvShows: any[] }>({ movies: [], tvShows: [] });
 
   useEffect(() => {
-    setQuery(q || '');
-    if (q) {
-      document.title = `Search results for "${q}" | TimesEntertain`;
+    const newQuery = searchParams.get('q') || '';
+    setQuery(newQuery);
+    if (newQuery) {
+      document.title = `Search results for "${newQuery}" | TimesEntertain`;
     } else {
       document.title = `Search | TimesEntertain`;
     }
-  }, [q]);
+  }, [searchParams]);
   
   useEffect(() => {
-    async function fetchAndFilter() {
-      if (!query) {
-        setFilteredMovies([]);
-        setFilteredTvShows([]);
-        return;
-      }
-      
-      const lowercaseQuery = query.toLowerCase();
-
-      // Fetch movies and people
-      const [moviesRes, personsRes] = await Promise.all([
-        fetch('/movies.json'),
-        fetch('/persons.json')
-      ]);
-      const movies: Movie[] = await moviesRes.json();
-      const persons: Person[] = await personsRes.json();
-      
-      const personIdsMatchingQuery = persons
-        .filter(p => p.name.toLowerCase().includes(lowercaseQuery))
-        .map(p => p.id);
-
-      const moviesResult = movies.filter(
-        (movie) =>
-          movie.title.toLowerCase().includes(lowercaseQuery) ||
-          movie.cast_ids.some(id => personIdsMatchingQuery.includes(id)) ||
-          movie.crew_ids.some(id => personIdsMatchingQuery.includes(id)) // Search crew too
-      );
-      setFilteredMovies(moviesResult);
-
-      const tvShowsResult = tvShows.filter(
-        (show) =>
-          show.title.toLowerCase().includes(lowercaseQuery) ||
-          show.cast.some((c) => c.name.toLowerCase().includes(lowercaseQuery))
-      );
-      setFilteredTvShows(tvShowsResult);
+    if (!query) {
+      setResults({ movies: [], tvShows: [] });
+      return;
     }
 
-    fetchAndFilter();
+    setIsLoading(true);
+    debouncedFetch(query).then(data => {
+      setResults(data);
+      setIsLoading(false);
+    });
 
   }, [query]);
 
-  const hasResults = filteredMovies.length > 0 || filteredTvShows.length > 0;
+  const hasResults = results.movies.length > 0 || results.tvShows.length > 0;
 
   if (!query) {
     return (
@@ -82,25 +83,27 @@ export default function SearchResults() {
         Search Results for &quot;{query}&quot;
       </h1>
 
-      {!hasResults ? (
+      {isLoading ? (
+          <p>Searching...</p>
+      ) : !hasResults ? (
         <p>No results found for your search.</p>
       ) : (
         <div className="space-y-12">
-          {filteredMovies.length > 0 && (
+          {results.movies.length > 0 && (
             <section>
               <h2 className="text-2xl font-headline font-bold mb-4">
                 Movies
               </h2>
-              <ContentGrid items={filteredMovies} type="movies" />
+              <ContentGrid items={results.movies} type="movies" />
             </section>
           )}
 
-          {filteredTvShows.length > 0 && (
+          {results.tvShows.length > 0 && (
             <section>
               <h2 className="text-2xl font-headline font-bold mb-4">
                 TV Shows
               </h2>
-              <ContentGrid items={filteredTvShows} type="tv" />
+              <ContentGrid items={results.tvShows} type="tv" />
             </section>
           )}
         </div>

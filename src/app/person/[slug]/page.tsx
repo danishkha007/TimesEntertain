@@ -1,35 +1,40 @@
 
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { promises as fs } from 'fs';
-import path from 'path';
 import { slugify } from '@/lib/utils';
 import type { Person, Movie } from '@/lib/types';
 import type { Metadata } from 'next';
 import { ContentGrid } from '@/components/ContentGrid';
+import db from '@/lib/db';
+import type { RowDataPacket } from 'mysql2';
 
 async function getPersonData(slug: string): Promise<{ person: Person; movies: Movie[] } | null> {
   try {
-    const personFilePath = path.join(process.cwd(), 'public/persons.json');
-    const movieFilePath = path.join(process.cwd(), 'public/movies.json');
-    
-    const [personsFile, moviesFile] = await Promise.all([
-        fs.readFile(personFilePath, 'utf-8'),
-        fs.readFile(movieFilePath, 'utf-8'),
-    ]);
+    const [personRows] = await db.query<RowDataPacket[]>("SELECT * FROM people WHERE ? = (SELECT slugify(name)) LIMIT 1", [slug]);
 
-    const persons: Person[] = JSON.parse(personsFile);
-    const allMovies: Movie[] = JSON.parse(moviesFile);
-    
-    const person = persons.find((p) => slugify(p.name) === slug);
-
-    if (!person) {
+    if (personRows.length === 0) {
         return null;
     }
+    const person = personRows[0] as Person;
 
-    const movies = allMovies.filter(movie => 
-        movie.cast_ids.includes(person.id) || movie.crew_ids.includes(person.id)
-    );
+    const [movieRows] = await db.query<RowDataPacket[]>(`
+        SELECT DISTINCT m.*, GROUP_CONCAT(g.name) as genres
+        FROM movies m
+        LEFT JOIN movie_genres mg ON m.id = mg.movie_id
+        LEFT JOIN genres g ON mg.genre_id = g.id
+        WHERE m.id IN (
+            SELECT movie_id FROM movie_cast WHERE person_id = ?
+            UNION
+            SELECT movie_id FROM movie_crew WHERE person_id = ?
+        )
+        GROUP BY m.id
+        ORDER BY m.popularity DESC
+    `, [person.id, person.id]);
+
+    const movies = movieRows.map(row => ({
+        ...row,
+        genres: row.genres ? row.genres.split(',') : [],
+    })) as Movie[];
 
     return { person, movies };
 
@@ -57,7 +62,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
   }
 
-  const imageUrl = data.person.profile_url || 'https://placehold.co/400x600.png';
+  const imageUrl = data.person.profile_path ? `${process.env.TMDB_IMAGE_BASE_URL}w500${data.person.profile_path}` : 'https://placehold.co/400x600.png';
 
   return {
     title: data.person.name,
@@ -86,7 +91,7 @@ export default async function PersonDetailPage({ params }: { params: { slug: str
   }
 
   const { person, movies } = data;
-  const profileUrl = person.profile_url || "https://placehold.co/400x600.png";
+  const profileUrl = person.profile_path ? `${process.env.TMDB_IMAGE_BASE_URL}w500${person.profile_path}` : "https://placehold.co/400x600.png";
 
   return (
     <article>
