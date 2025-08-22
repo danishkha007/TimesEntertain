@@ -241,7 +241,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
           <VideoPlayer videos={movie.videos} movieTitle={movie.title} />
         )}
 
-        <SimilarMovies currentMovieId={movie.id} />
+        <SimilarMovies currentMovieSlug={params.slug} />
       </article>
     </>
   );

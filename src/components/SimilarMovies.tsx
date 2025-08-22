@@ -11,11 +11,11 @@ import { ContentCard } from '@/components/ContentCard';
 import { getSimilarMovies } from '@/services/movieService';
 
 interface SimilarMoviesProps {
-    currentMovieId: number;
+    currentMovieSlug: string;
 }
 
-export async function SimilarMovies({ currentMovieId }: SimilarMoviesProps) {
-    const similarMovies = await getSimilarMovies(currentMovieId);
+export async function SimilarMovies({ currentMovieSlug }: SimilarMoviesProps) {
+    const similarMovies = await getSimilarMovies(currentMovieSlug);
 
     if (!similarMovies || similarMovies.length === 0) {
         return null;

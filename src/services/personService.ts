@@ -30,14 +30,14 @@ export async function getPersonBySlug(slug: string): Promise<Person | null> {
     }
 }
 
-export async function getMovieCast(movieId: number): Promise<Person[]> {
+export async function getMovieCast(movieSlug: string): Promise<Person[]> {
     try {
-        const res = await fetch(`${API_BASE_URL}/movies/${movieId}/cast`);
+        const res = await fetch(`${API_BASE_URL}/movies/${movieSlug}/cast`);
          if (!res.ok) throw new Error('Failed to fetch cast');
         const { data } = await res.json();
         return data;
     } catch (error) {
-        console.error(`API Error fetching cast for movie ${movieId}:`, error);
+        console.error(`API Error fetching cast for movie ${movieSlug}:`, error);
         return [];
     }
 }
