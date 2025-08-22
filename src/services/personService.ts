@@ -1,17 +1,14 @@
 
-import db from '@/lib/db';
 import type { Person } from '@/lib/types';
-import type { RowDataPacket } from 'mysql2';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+
 
 export async function getPopularPeople(limit = 10): Promise<Person[]> {
   try {
-    const [rows] = await db.query<RowDataPacket[]>(`
-      SELECT p.*
-      FROM people p
-      ORDER BY p.popularity DESC
-      LIMIT ?
-    `, [limit]);
-    return rows as Person[];
+    const res = await fetch(`${API_BASE_URL}/persons/popular?limit=${limit}`);
+    if (!res.ok) throw new Error('Failed to fetch popular people');
+    const { data } = await res.json();
+    return data;
   } catch (error) {
     console.error(`Failed to fetch popular people:`, error);
     return [];
@@ -19,31 +16,28 @@ export async function getPopularPeople(limit = 10): Promise<Person[]> {
 }
 
 export async function getPersonBySlug(slug: string): Promise<Person | null> {
-    const [personRows] = await db.query<RowDataPacket[]>("SELECT * FROM people WHERE slugify(name) = ? LIMIT 1", [slug]);
-
-    if (personRows.length === 0) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/persons/${slug}`);
+        if (!res.ok) {
+            if (res.status === 404) return null;
+            throw new Error(`Failed to fetch person: ${slug}`);
+        }
+        const { data } = await res.json();
+        return data;
+    } catch (error) {
+        console.error(`API Error fetching person ${slug}:`, error);
         return null;
     }
-    return personRows[0] as Person;
-}
-
-export async function getAllPersonNames(): Promise<{ name: string }[]> {
-  try {
-    const [rows] = await db.query<RowDataPacket[]>("SELECT name FROM people");
-    return rows as { name: string }[];
-  } catch (error) {
-    console.error('Failed to load person names for sitemap:', error);
-    return [];
-  }
 }
 
 export async function getMovieCast(movieId: number): Promise<Person[]> {
-  const [castRows] = await db.query<RowDataPacket[]>(`
-      SELECT p.id, p.name, mc.character_name as 'character'
-      FROM movie_cast mc
-      JOIN people p ON mc.person_id = p.id
-      WHERE mc.movie_id = ?
-      ORDER BY mc.cast_order ASC
-  `, [movieId]);
-  return castRows as Person[];
+    try {
+        const res = await fetch(`${API_BASE_URL}/movies/${movieId}/cast`);
+         if (!res.ok) throw new Error('Failed to fetch cast');
+        const { data } = await res.json();
+        return data;
+    } catch (error) {
+        console.error(`API Error fetching cast for movie ${movieId}:`, error);
+        return [];
+    }
 }

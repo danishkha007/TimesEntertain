@@ -4,10 +4,11 @@ import { slugify } from '@/lib/utils';
 import type { Movie } from '@/lib/types';
 import { ContentGrid } from '@/components/ContentGrid';
 import type { Metadata } from 'next';
-import { getMoviesByGenreSlug } from '@/services/movieService';
+import { getMoviesByGenreSlug } from '@/services/genreService';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { genreName } = await getMoviesByGenreSlug(params.slug);
+  // Assuming getMoviesByGenreSlug can also return genre name, or we need a new service
+  const genreName = params.slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
   if (!genreName) {
     return {

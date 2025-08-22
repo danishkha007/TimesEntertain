@@ -1,11 +1,10 @@
 
 import type { MetadataRoute } from 'next';
-import type { TVShow } from '@/lib/types';
+import type { Movie, Person, TVShow } from '@/lib/types';
 import { slugify } from '@/lib/utils';
 import { tvShows } from '@/lib/data';
-import { getAllMovieTitles } from '@/services/movieService';
-import { getAllPersonNames } from '@/services/personService';
-import { getAllGenreNames } from '@/services/genreService';
+import { getAllMovieTitles, getAllPersonNames, getAllGenreNames } from '@/services/sitemapService';
+
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
