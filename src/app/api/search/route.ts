@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import type { RowDataPacket } from 'mysql2';
@@ -29,6 +30,7 @@ export async function GET(request: Request) {
     const filteredMovies = movies.map(row => ({
         ...row,
         genres: row.genres ? row.genres.split(',') : [],
+        vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average,
     })) as Movie[];
     
     // Placeholder TV show search

@@ -28,6 +28,7 @@ async function getMoviesByGenre(genreSlug: string): Promise<{ movies: Movie[], g
     const movies = movieRows.map(row => ({
         ...row,
         genres: row.genres ? row.genres.split(',') : [],
+        vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average,
     })) as Movie[];
 
     return { movies, genreName };

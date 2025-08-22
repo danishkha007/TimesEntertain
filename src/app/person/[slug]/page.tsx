@@ -34,6 +34,7 @@ async function getPersonData(slug: string): Promise<{ person: Person; movies: Mo
     const movies = movieRows.map(row => ({
         ...row,
         genres: row.genres ? row.genres.split(',') : [],
+        vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average,
     })) as Movie[];
 
     return { person, movies };

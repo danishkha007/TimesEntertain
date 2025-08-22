@@ -43,12 +43,14 @@ async function getMovieData(slug: string): Promise<Movie | null> {
         `, [slug]);
 
         if (movieRows.length === 0) return null;
+        
+        const rawMovie = movieRows[0];
 
         let movie: Movie = {
-            ...movieRows[0],
-            genres: movieRows[0].genres ? movieRows[0].genres.split(',') : [],
-            release_date: new Date(movieRows[0].release_date).toISOString(),
-            vote_average: movieRows[0].vote_average
+            ...rawMovie,
+            genres: rawMovie.genres ? rawMovie.genres.split(',') : [],
+            release_date: new Date(rawMovie.release_date).toISOString(),
+            vote_average: typeof rawMovie.vote_average === 'string' ? parseFloat(rawMovie.vote_average) : rawMovie.vote_average,
         } as Movie;
 
         // Fetch Cast

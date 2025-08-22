@@ -1,3 +1,4 @@
+
 import type { Movie } from '@/lib/types';
 import {
     Carousel,
@@ -36,6 +37,7 @@ async function getSimilarMovies(currentMovieId: number, castIds: number[]): Prom
         return rows.map(row => ({
             ...row,
             genres: row.genres ? row.genres.split(',') : [],
+            vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average,
         })) as Movie[];
 
     } catch (error) {

@@ -1,3 +1,4 @@
+
 import { ContentGrid } from '@/components/ContentGrid';
 import type { Movie } from '@/lib/types';
 import { MovieFilters } from './_components/MovieFilters';
@@ -23,7 +24,7 @@ async function getAllMovies(): Promise<Movie[]> {
     return rows.map(row => ({
       ...row,
       genres: row.genres ? row.genres.split(',') : [],
-      vote_average: row.vote_average
+      vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average,
     })) as Movie[];
   } catch (error) {
     console.error("Failed to load movies:", error);

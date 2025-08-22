@@ -35,7 +35,7 @@ async function getPopularMovies(): Promise<Movie[]> {
     return rows.map(row => ({
       ...row,
       genres: row.genres ? row.genres.split(',') : [],
-      vote_average: row.vote_average
+      vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average
     })) as Movie[];
   } catch (error) {
     console.error('Failed to fetch and process movies:', error);
