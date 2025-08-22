@@ -5,7 +5,7 @@ import type { Person, Movie } from '@/lib/types';
 import type { Metadata } from 'next';
 import { ContentGrid } from '@/components/ContentGrid';
 import { getPersonBySlug } from '@/services/personService';
-import { getMoviesByPersonId } from '@/services/movieService';
+import { getMoviesByPersonSlug } from '@/services/personService';
 
 
 async function getPersonData(slug: string): Promise<{ person: Person; movies: Movie[] } | null> {
@@ -13,7 +13,7 @@ async function getPersonData(slug: string): Promise<{ person: Person; movies: Mo
     const person = await getPersonBySlug(slug);
     if (!person) return null;
 
-    const movies = await getMoviesByPersonId(person.id);
+    const movies = await getMoviesByPersonSlug(slug);
     return { person, movies };
 
   } catch (error) {

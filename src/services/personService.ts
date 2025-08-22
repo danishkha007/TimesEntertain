@@ -30,6 +30,18 @@ export async function getPersonBySlug(slug: string): Promise<Person | null> {
     }
 }
 
+export async function getMoviesByPersonSlug(slug: string): Promise<any[]> {
+    try {
+        const res = await fetch(`${API_BASE_URL}/persons/${slug}/movies`);
+        if (!res.ok) throw new Error('Failed to fetch movies for person');
+        const { data } = await res.json();
+        return data;
+    } catch (error) {
+        console.error(`API Error fetching movies for person ${slug}:`, error);
+        return [];
+    }
+}
+
 export async function getMovieCast(movieSlug: string): Promise<Person[]> {
     try {
         const res = await fetch(`${API_BASE_URL}/movies/${movieSlug}/cast`);
