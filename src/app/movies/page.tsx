@@ -4,17 +4,22 @@ import { MovieFilters } from './_components/MovieFilters';
 import { MovieList } from './_components/MovieList';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getAllMovies } from '@/services/movieService';
+import { getMovies } from '@/services/movieService';
 import { getAllGenres } from '@/services/genreService';
 
-function MoviePageContent({ movies, genres }: { movies: Movie[], genres: string[] }) {
+async function MoviePageContent() {
+    const [{ movies, pagination }, genres] = await Promise.all([
+      getMovies({ page: 1, limit: 18 }), // Fetch initial page
+      getAllGenres()
+    ]);
+    
     return (
         <div>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <h1 className="text-3xl font-headline font-bold">All Movies</h1>
                 <MovieFilters genres={genres} />
             </div>
-            <MovieList movies={movies} />
+            <MovieList initialMovies={movies} initialTotalPages={pagination.totalPages} />
         </div>
     );
 }
@@ -44,12 +49,9 @@ function MovieListFallback() {
 }
 
 export default async function MoviesPage() {
-  const allMovies = await getAllMovies();
-  const genres = await getAllGenres();
-  
   return (
     <Suspense fallback={<MovieListFallback />}>
-      <MoviePageContent movies={allMovies} genres={genres} />
+      <MoviePageContent />
     </Suspense>
   );
 }

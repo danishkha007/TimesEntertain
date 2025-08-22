@@ -3,9 +3,9 @@
 
 import { useSearchParams } from 'next/navigation';
 import { ContentGrid } from "@/components/ContentGrid";
-import { tvShows } from "@/lib/data";
 import { useEffect, useState } from 'react';
 import type { Movie } from '@/lib/types';
+import { searchContent } from '@/services/movieService';
 
 // Debounce function
 function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
@@ -17,23 +17,7 @@ function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
     });
 }
 
-// NOTE: This component is now responsible for its own data fetching.
-// In a larger app, you might move this to a server action or API route.
-async function fetchSearchResults(query: string): Promise<{ movies: Movie[], tvShows: any[] }> {
-    if (!query) return { movies: [], tvShows: [] };
-    
-    // This is a simplified search. A real implementation would use Full-Text Search
-    // on more fields and be more sophisticated.
-    const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-    if (!res.ok) {
-        console.error("Search failed");
-        return { movies: [], tvShows: [] };
-    }
-    return res.json();
-}
-
-const debouncedFetch = debounce(fetchSearchResults, 300);
-
+const debouncedFetch = debounce(searchContent, 300);
 
 export default function SearchResults() {
   const searchParams = useSearchParams();

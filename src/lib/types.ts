@@ -33,7 +33,7 @@ export interface Video {
   type: string;
   official: boolean;
   published_at: string;
-  url: string;
+  url?: string; // Made optional as it's constructed
 }
 
 export interface OttProvider {

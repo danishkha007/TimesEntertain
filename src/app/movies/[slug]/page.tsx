@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
   }
 
-  const imageUrl = movie.poster_path ? `${process.env.TMDB_IMAGE_BASE_URL}w500${movie.poster_path}` : 'https://placehold.co/400x600.png';
+  const imageUrl = movie.poster_path ? `${process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL}w500${movie.poster_path}` : 'https://placehold.co/400x600.png';
   const year = getYear(movie.release_date);
   const title = `${movie.title} (${year}) | Movie Details, Cast & Reviews`;
   const description = `Explore details for the movie ${movie.title} (${year}). Find cast information, director, user reviews, ratings, where to watch, and watch official trailers. Your ultimate guide to ${movie.title}.`;
@@ -75,7 +75,7 @@ const getEmbedUrl = (video: Video) => {
     if (video.site === 'YouTube') {
         return `https://www.youtube.com/embed/${video.key_id}`;
     }
-    return video.url; // Fallback
+    return ``; // Fallback removed for security
 };
 
 export default async function MovieDetailPage({ params }: { params: { slug: string }}) {
@@ -93,7 +93,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
     '@type': 'Movie',
     name: movie.title,
     datePublished: movie.release_date,
-    image: movie.poster_path ? `${process.env.TMDB_IMAGE_BASE_URL}w500${movie.poster_path}` : '',
+    image: movie.poster_path ? `${process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL}w500${movie.poster_path}` : '',
     description: movie.overview,
     director: movie.director ? {
       '@type': 'Person',
@@ -115,7 +115,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
     } : undefined,
   };
   
-  const posterUrl = movie.poster_path ? `${process.env.TMDB_IMAGE_BASE_URL}w500${movie.poster_path}` : "https://placehold.co/400x600.png";
+  const posterUrl = movie.poster_path ? `${process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL}w500${movie.poster_path}` : "https://placehold.co/400x600.png";
 
   return (
     <>
@@ -241,9 +241,7 @@ export default async function MovieDetailPage({ params }: { params: { slug: stri
           <VideoPlayer videos={movie.videos} movieTitle={movie.title} />
         )}
 
-        {movie.cast && movie.cast.length > 0 && (
-          <SimilarMovies currentMovieId={movie.id} castIds={movie.cast.map(c => c.id)} />
-        )}
+        <SimilarMovies currentMovieId={movie.id} />
       </article>
     </>
   );

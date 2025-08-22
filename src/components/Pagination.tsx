@@ -16,17 +16,20 @@ import { useCallback } from "react";
 interface PaginationProps {
   totalPages: number;
   currentPage: number;
+  baseUrl?: string; // Optional base URL, defaults to current path
 }
 
-export function Pagination({ totalPages, currentPage }: PaginationProps) {
+export function Pagination({ totalPages, currentPage, baseUrl }: PaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = baseUrl || (typeof window !== 'undefined' ? window.location.pathname : '/');
+
 
   const createPageURL = useCallback((pageNumber: number) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", pageNumber.toString());
-    return `/movies?${params.toString()}`;
-  }, [searchParams]);
+    return `${pathname}?${params.toString()}`;
+  }, [searchParams, pathname]);
 
   const renderPaginationItems = () => {
     const pageNumbers = [];

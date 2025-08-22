@@ -12,13 +12,12 @@ import { getSimilarMovies } from '@/services/movieService';
 
 interface SimilarMoviesProps {
     currentMovieId: number;
-    castIds: number[];
 }
 
-export async function SimilarMovies({ currentMovieId, castIds }: SimilarMoviesProps) {
-    const similarMovies = await getSimilarMovies(currentMovieId, castIds);
+export async function SimilarMovies({ currentMovieId }: SimilarMoviesProps) {
+    const similarMovies = await getSimilarMovies(currentMovieId);
 
-    if (similarMovies.length === 0) {
+    if (!similarMovies || similarMovies.length === 0) {
         return null;
     }
 

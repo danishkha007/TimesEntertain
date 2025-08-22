@@ -2,63 +2,61 @@
 "use client";
 
 import { useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { ContentGrid } from '@/components/ContentGrid';
 import type { Movie } from '@/lib/types';
 import { Pagination } from '@/components/Pagination';
+import { getMovies } from '@/services/movieService';
 
 interface MovieListProps {
-  movies: Movie[];
+  initialMovies: Movie[];
+  initialTotalPages: number;
 }
 
-const MOVIES_PER_PAGE = 18;
-
-export function MovieList({ movies }: MovieListProps) {
+export function MovieList({ initialMovies, initialTotalPages }: MovieListProps) {
   const searchParams = useSearchParams();
-
-  const filteredAndSortedMovies = useMemo(() => {
-    let filtered = [...movies];
-
-    const genre = searchParams.get('genre');
-    if (genre && genre !== 'all') {
-      filtered = filtered.filter(movie => movie.genres.includes(genre));
-    }
-
-    const sort = searchParams.get('sort') || 'popularity.desc';
-    switch (sort) {
-      case 'release_date.desc':
-        filtered.sort((a, b) => new Date(b.release_date).getTime() - new Date(a.release_date).getTime());
-        break;
-      case 'release_date.asc':
-        filtered.sort((a, b) => new Date(a.release_date).getTime() - new Date(b.release_date).getTime());
-        break;
-      case 'vote_average.desc':
-        filtered.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
-        break;
-      case 'popularity.desc':
-      default:
-        // Assuming higher vote_count is more popular
-        filtered.sort((a, b) => b.vote_count - a.vote_count);
-        break;
-    }
-    return filtered;
-  }, [movies, searchParams]);
+  const [movies, setMovies] = useState(initialMovies);
+  const [totalPages, setTotalPages] = useState(initialTotalPages);
+  const [isLoading, setIsLoading] = useState(false);
 
   const page = searchParams.get('page') ? parseInt(searchParams.get('page') as string, 10) : 1;
-  const totalPages = Math.ceil(filteredAndSortedMovies.length / MOVIES_PER_PAGE);
-  const moviesForPage = filteredAndSortedMovies.slice((page - 1) * MOVIES_PER_PAGE, page * MOVIES_PER_PAGE);
+  const genre = searchParams.get('genre');
+  const sort = searchParams.get('sort');
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      setIsLoading(true);
+      const { movies: newMovies, pagination } = await getMovies({ 
+        page, 
+        genre: genre || undefined,
+        sort: sort || undefined
+      });
+      setMovies(newMovies);
+      setTotalPages(pagination.totalPages);
+      setIsLoading(false);
+    };
+
+    // We don't refetch for the initial state which is server-rendered
+    const hasFilters = page > 1 || genre || sort;
+    if (hasFilters) {
+        fetchMovies();
+    } else {
+        setMovies(initialMovies);
+        setTotalPages(initialTotalPages);
+    }
+  }, [page, genre, sort, initialMovies, initialTotalPages]);
+  
+  if (isLoading) {
+    return <p>Loading movies...</p>;
+  }
 
   if (movies.length === 0) {
-    return <p>No movies available.</p>;
-  }
-  
-  if (moviesForPage.length === 0) {
     return <p>No movies found that match your criteria.</p>;
   }
 
   return (
     <>
-      <ContentGrid items={moviesForPage} type="movies" />
+      <ContentGrid items={movies} type="movies" />
       <div className="mt-12 flex justify-center">
         <Pagination
           totalPages={totalPages}

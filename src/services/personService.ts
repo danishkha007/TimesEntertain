@@ -36,3 +36,14 @@ export async function getAllPersonNames(): Promise<{ name: string }[]> {
     return [];
   }
 }
+
+export async function getMovieCast(movieId: number): Promise<Person[]> {
+  const [castRows] = await db.query<RowDataPacket[]>(`
+      SELECT p.id, p.name, mc.character_name as 'character'
+      FROM movie_cast mc
+      JOIN people p ON mc.person_id = p.id
+      WHERE mc.movie_id = ?
+      ORDER BY mc.cast_order ASC
+  `, [movieId]);
+  return castRows as Person[];
+}
