@@ -19,7 +19,7 @@ export async function getPopularPeople(limit = 10): Promise<Person[]> {
 }
 
 export async function getPersonBySlug(slug: string): Promise<Person | null> {
-    const [personRows] = await db.query<RowDataPacket[]>("SELECT * FROM people WHERE ? = (SELECT slugify(name)) LIMIT 1", [slug]);
+    const [personRows] = await db.query<RowDataPacket[]>("SELECT * FROM people WHERE slugify(name) = ? LIMIT 1", [slug]);
 
     if (personRows.length === 0) {
         return null;

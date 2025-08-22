@@ -63,7 +63,7 @@ export async function getMovieBySlug(slug: string): Promise<Movie | null> {
             FROM movies m
             LEFT JOIN movie_genres mg ON m.id = mg.movie_id
             LEFT JOIN genres g ON mg.genre_id = g.id
-            WHERE ? = (SELECT slugify(m.title))
+            WHERE slugify(m.title) = ?
             GROUP BY m.id
             LIMIT 1
         `, [slug]);
@@ -110,6 +110,13 @@ export async function getMovieBySlug(slug: string): Promise<Movie | null> {
             SELECT * FROM videos WHERE entity_type = 'movie' AND entity_id = ?
         `, [movie.id]);
         movie.videos = videoRows as Video[];
+        
+        // Fetch OTT Providers (Watch Providers)
+        // This is a placeholder as the provided schema doesn't have a direct table for this.
+        // Assuming you might have a JSON field or related tables in a full setup.
+        // For now, let's keep it empty or mock it.
+        movie.ott_platforms = {}; // Example: { flatrate: [], rent: [], buy: [] }
+
 
         return movie;
 
@@ -122,14 +129,14 @@ export async function getMovieBySlug(slug: string): Promise<Movie | null> {
 
 export async function getMoviesByGenreSlug(genreSlug: string): Promise<{ movies: Movie[], genreName: string | null }> {
   try {
-    const [genreRows] = await db.query<RowDataPacket[]>("SELECT name FROM genres WHERE ? = (SELECT slugify(name)) LIMIT 1", [genreSlug]);
+    const [genreRows] = await db.query<RowDataPacket[]>("SELECT name FROM genres WHERE slugify(name) = ? LIMIT 1", [genreSlug]);
     if (genreRows.length === 0) {
       return { movies: [], genreName: null };
     }
     const genreName = genreRows[0].name;
 
     const [movieRows] = await db.query<RowDataPacket[]>(`
-        SELECT m.*, GROUP_CONCAT(g.name) as genres
+        SELECT m.*, GROUP_CONCAT(DISTINCT g.name) as genres
         FROM movies m
         JOIN movie_genres mg ON m.id = mg.movie_id
         JOIN genres g ON mg.genre_id = g.id
@@ -154,7 +161,7 @@ export async function getSimilarMovies(currentMovieId: number, castIds: number[]
         const params = [currentMovieId, ...castIds];
 
         const [rows] = await db.query<RowDataPacket[]>(`
-            SELECT DISTINCT m.*, GROUP_CONCAT(g.name) as genres
+            SELECT DISTINCT m.*, GROUP_CONCAT(DISTINCT g.name) as genres
             FROM movies m
             JOIN movie_cast mc ON m.id = mc.movie_id
             LEFT JOIN movie_genres mg ON m.id = mg.movie_id
@@ -175,7 +182,7 @@ export async function getSimilarMovies(currentMovieId: number, castIds: number[]
 
 export async function getMoviesByPersonId(personId: number): Promise<Movie[]> {
     const [movieRows] = await db.query<RowDataPacket[]>(`
-        SELECT DISTINCT m.*, GROUP_CONCAT(g.name) as genres
+        SELECT DISTINCT m.*, GROUP_CONCAT(DISTINCT g.name) as genres
         FROM movies m
         LEFT JOIN movie_genres mg ON m.id = mg.movie_id
         LEFT JOIN genres g ON mg.genre_id = g.id
@@ -194,7 +201,7 @@ export async function getMoviesByPersonId(personId: number): Promise<Movie[]> {
 export async function searchMovies(query: string): Promise<Movie[]> {
     const searchQuery = `%${query}%`;
     const [movies] = await db.query<RowDataPacket[]>(`
-      SELECT m.*, GROUP_CONCAT(g.name) as genres
+      SELECT m.*, GROUP_CONCAT(DISTINCT g.name) as genres
       FROM movies m
       LEFT JOIN movie_genres mg ON m.id = mg.movie_id
       LEFT JOIN genres g ON mg.genre_id = g.id
