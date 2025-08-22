@@ -205,10 +205,16 @@ export async function searchMovies(query: string): Promise<Movie[]> {
       FROM movies m
       LEFT JOIN movie_genres mg ON m.id = mg.movie_id
       LEFT JOIN genres g ON mg.genre_id = g.id
-      WHERE m.title LIKE ?
+      WHERE m.title LIKE ? 
+      OR m.id IN (
+        SELECT mc.movie_id 
+        FROM movie_cast mc 
+        JOIN people p ON mc.person_id = p.id 
+        WHERE p.name LIKE ?
+      )
       GROUP BY m.id
       LIMIT 20
-    `, [searchQuery]);
+    `, [searchQuery, searchQuery]);
 
     return processMovieRows(movies);
 }

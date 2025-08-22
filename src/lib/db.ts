@@ -1,3 +1,4 @@
+
 import mysql from 'mysql2/promise';
 
 const pool = mysql.createPool({
@@ -12,44 +13,54 @@ const pool = mysql.createPool({
 
 // Function to create the slugify function in the database if it doesn't exist.
 async function createSlugifyFunction() {
-  const connection = await pool.getConnection();
+  let connection;
   try {
+    connection = await pool.getConnection();
     // This query creates a slugify function within MySQL.
     // It's designed to be idempotent (it won't fail if the function already exists).
     await connection.query(`
-      CREATE FUNCTION IF NOT EXISTS slugify(str TEXT)
-      RETURNS TEXT
+      CREATE FUNCTION IF NOT EXISTS slugify(dirty_string text)
+      RETURNS text
       DETERMINISTIC
-      NO SQL
       BEGIN
-          DECLARE lower_str TEXT;
-          DECLARE result TEXT;
-          SET lower_str = LOWER(str);
-          -- Replace spaces with hyphens
-          SET result = REPLACE(lower_str, ' ', '-');
-          -- Remove all non-alphanumeric characters except hyphens
-          -- This requires a more complex loop in MySQL, but for most cases a simple replace works.
-          -- A more robust solution might involve a stored procedure or multiple REPLACE calls.
-          -- For now, this will handle the most common cases.
-          -- Let's add more replaces for common special characters.
-          SET result = REPLACE(result, ':', '');
-          SET result = REPLACE(result, '\'', '');
-          SET result = REPLACE(result, '"', '');
-          SET result = REPLACE(result, '?', '');
-          SET result = REPLACE(result, '&', 'and');
-          SET result = REPLACE(result, '.', '');
-          SET result = REPLACE(result, ',', '');
-          -- Replace multiple hyphens with a single one
-          WHILE (result LIKE '%--%') DO
-              SET result = REPLACE(result, '--', '-');
+          DECLARE x, y, z text;
+          DECLARE p, last_p INT;
+          SET z = 'abcdefghijklmnopqrstuvwxyz0123456789-';
+          SET x = LOWER(dirty_string);
+          SET x = REPLACE(x, ' ', '-');
+
+          SET p = 1;
+          SET y = '';
+          REPEAT
+              SET last_p = p;
+              SET p = LOCATE(SUBSTRING(x, last_p, 1), z);
+              IF p > 0 THEN
+                  SET y = CONCAT(y, SUBSTRING(x, last_p, 1));
+              END IF;
+              SET p = last_p + 1;
+          UNTIL p > CHAR_LENGTH(x) END REPEAT;
+          
+          WHILE (y LIKE '%--%') DO
+              SET y = REPLACE(y, '--', '-');
           END WHILE;
-          RETURN result;
-      END;
+
+          IF y LIKE '-%' THEN
+              SET y = SUBSTRING(y, 2);
+          END IF;
+          IF y LIKE '%-' THEN
+              SET y = SUBSTRING(y, 1, CHAR_LENGTH(y) - 1);
+          END IF;
+          
+          RETURN y;
+      END
     `);
   } catch (error) {
     console.error('Failed to create slugify function:', error);
+    // We don't want to throw here as it might crash the app on startup
   } finally {
-    connection.release();
+    if (connection) {
+      connection.release();
+    }
   }
 }
 
