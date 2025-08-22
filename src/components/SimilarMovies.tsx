@@ -8,42 +8,11 @@ import {
     CarouselPrevious,
 } from '@/components/ui/carousel';
 import { ContentCard } from '@/components/ContentCard';
-import db from '@/lib/db';
-import type { RowDataPacket } from 'mysql2';
+import { getSimilarMovies } from '@/services/movieService';
 
 interface SimilarMoviesProps {
     currentMovieId: number;
     castIds: number[];
-}
-
-async function getSimilarMovies(currentMovieId: number, castIds: number[]): Promise<Movie[]> {
-    if (castIds.length === 0) return [];
-    try {
-        const placeholders = castIds.map(() => '?').join(',');
-        const params = [currentMovieId, ...castIds];
-
-        const [rows] = await db.query<RowDataPacket[]>(`
-            SELECT DISTINCT m.*, GROUP_CONCAT(g.name) as genres
-            FROM movies m
-            JOIN movie_cast mc ON m.id = mc.movie_id
-            LEFT JOIN movie_genres mg ON m.id = mg.movie_id
-            LEFT JOIN genres g ON mg.genre_id = g.id
-            WHERE m.id != ? AND mc.person_id IN (${placeholders})
-            GROUP BY m.id
-            ORDER BY m.popularity DESC
-            LIMIT 10
-        `, params);
-        
-        return rows.map(row => ({
-            ...row,
-            genres: row.genres ? row.genres.split(',') : [],
-            vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average,
-        })) as Movie[];
-
-    } catch (error) {
-        console.error('Error fetching similar movies:', error);
-        return [];
-    }
 }
 
 export async function SimilarMovies({ currentMovieId, castIds }: SimilarMoviesProps) {

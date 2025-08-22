@@ -1,42 +1,19 @@
 
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { slugify } from '@/lib/utils';
 import type { Person, Movie } from '@/lib/types';
 import type { Metadata } from 'next';
 import { ContentGrid } from '@/components/ContentGrid';
-import db from '@/lib/db';
-import type { RowDataPacket } from 'mysql2';
+import { getPersonBySlug } from '@/services/personService';
+import { getMoviesByPersonId } from '@/services/movieService';
+
 
 async function getPersonData(slug: string): Promise<{ person: Person; movies: Movie[] } | null> {
   try {
-    const [personRows] = await db.query<RowDataPacket[]>("SELECT * FROM people WHERE ? = (SELECT slugify(name)) LIMIT 1", [slug]);
+    const person = await getPersonBySlug(slug);
+    if (!person) return null;
 
-    if (personRows.length === 0) {
-        return null;
-    }
-    const person = personRows[0] as Person;
-
-    const [movieRows] = await db.query<RowDataPacket[]>(`
-        SELECT DISTINCT m.*, GROUP_CONCAT(g.name) as genres
-        FROM movies m
-        LEFT JOIN movie_genres mg ON m.id = mg.movie_id
-        LEFT JOIN genres g ON mg.genre_id = g.id
-        WHERE m.id IN (
-            SELECT movie_id FROM movie_cast WHERE person_id = ?
-            UNION
-            SELECT movie_id FROM movie_crew WHERE person_id = ?
-        )
-        GROUP BY m.id
-        ORDER BY m.popularity DESC
-    `, [person.id, person.id]);
-
-    const movies = movieRows.map(row => ({
-        ...row,
-        genres: row.genres ? row.genres.split(',') : [],
-        vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average,
-    })) as Movie[];
-
+    const movies = await getMoviesByPersonId(person.id);
     return { person, movies };
 
   } catch (error) {

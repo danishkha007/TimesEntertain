@@ -1,47 +1,18 @@
 
 import type { MetadataRoute } from 'next';
-import type { Movie, Person, TVShow } from '@/lib/types';
+import type { TVShow } from '@/lib/types';
 import { slugify } from '@/lib/utils';
 import { tvShows } from '@/lib/data';
-import db from '@/lib/db';
-import type { RowDataPacket } from 'mysql2';
+import { getAllMovieTitles } from '@/services/movieService';
+import { getAllPersonNames } from '@/services/personService';
+import { getAllGenreNames } from '@/services/genreService';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
-async function getAllMovies(): Promise<Movie[]> {
-  try {
-    const [rows] = await db.query<RowDataPacket[]>("SELECT id, title FROM movies");
-    return rows as Movie[];
-  } catch (error) {
-    console.error('Failed to load movies for sitemap:', error);
-    return [];
-  }
-}
-
-async function getAllPersons(): Promise<Person[]> {
-  try {
-    const [rows] = await db.query<RowDataPacket[]>("SELECT id, name FROM people");
-    return rows as Person[];
-  } catch (error) {
-    console.error('Failed to load persons for sitemap:', error);
-    return [];
-  }
-}
-
-async function getAllGenres(): Promise<{name: string}[]> {
-   try {
-    const [rows] = await db.query<RowDataPacket[]>("SELECT name FROM genres");
-    return rows as {name: string}[];
-  } catch (error) {
-    console.error('Failed to load genres for sitemap:', error);
-    return [];
-  }
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const movies = await getAllMovies();
-  const persons = await getAllPersons();
-  const genres = await getAllGenres();
+  const movies = await getAllMovieTitles();
+  const persons = await getAllPersonNames();
+  const genres = await getAllGenreNames();
 
   const movieUrls = movies.map((movie) => ({
     url: `${baseUrl}/movies/${slugify(movie.title)}`,

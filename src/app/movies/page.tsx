@@ -1,46 +1,11 @@
 
-import { ContentGrid } from '@/components/ContentGrid';
 import type { Movie } from '@/lib/types';
 import { MovieFilters } from './_components/MovieFilters';
 import { MovieList } from './_components/MovieList';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import db from '@/lib/db';
-import type { RowDataPacket } from 'mysql2';
-
-async function getAllMovies(): Promise<Movie[]> {
-  try {
-     const [rows] = await db.query<RowDataPacket[]>(`
-      SELECT 
-        m.*, 
-        GROUP_CONCAT(DISTINCT g.name) AS genres
-      FROM movies m
-      LEFT JOIN movie_genres mg ON m.id = mg.movie_id
-      LEFT JOIN genres g ON mg.genre_id = g.id
-      GROUP BY m.id
-      ORDER BY m.popularity DESC
-    `);
-    
-    return rows.map(row => ({
-      ...row,
-      genres: row.genres ? row.genres.split(',') : [],
-      vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average,
-    })) as Movie[];
-  } catch (error) {
-    console.error("Failed to load movies:", error);
-    return [];
-  }
-}
-
-async function getAllGenres(): Promise<string[]> {
-    try {
-        const [rows] = await db.query<RowDataPacket[]>("SELECT name FROM genres ORDER BY name ASC");
-        return rows.map(row => row.name);
-    } catch (error) {
-        console.error("Failed to load genres:", error);
-        return [];
-    }
-}
+import { getAllMovies } from '@/services/movieService';
+import { getAllGenres } from '@/services/genreService';
 
 function MoviePageContent({ movies, genres }: { movies: Movie[], genres: string[] }) {
     return (

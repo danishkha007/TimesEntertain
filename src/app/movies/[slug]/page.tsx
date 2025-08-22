@@ -26,82 +26,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import db from '@/lib/db';
-import type { RowDataPacket } from 'mysql2';
-
-async function getMovieData(slug: string): Promise<Movie | null> {
-    try {
-        const [movieRows] = await db.query<RowDataPacket[]>(`
-            SELECT m.*, 
-                   GROUP_CONCAT(DISTINCT g.name) AS genres
-            FROM movies m
-            LEFT JOIN movie_genres mg ON m.id = mg.movie_id
-            LEFT JOIN genres g ON mg.genre_id = g.id
-            WHERE ? = (SELECT slugify(m.title))
-            GROUP BY m.id
-            LIMIT 1
-        `, [slug]);
-
-        if (movieRows.length === 0) return null;
-        
-        const rawMovie = movieRows[0];
-
-        let movie: Movie = {
-            ...rawMovie,
-            genres: rawMovie.genres ? rawMovie.genres.split(',') : [],
-            release_date: new Date(rawMovie.release_date).toISOString(),
-            vote_average: typeof rawMovie.vote_average === 'string' ? parseFloat(rawMovie.vote_average) : rawMovie.vote_average,
-        } as Movie;
-
-        // Fetch Cast
-        const [castRows] = await db.query<RowDataPacket[]>(`
-            SELECT p.*, mc.character_name as 'character'
-            FROM movie_cast mc
-            JOIN people p ON mc.person_id = p.id
-            WHERE mc.movie_id = ?
-            ORDER BY mc.cast_order ASC
-        `, [movie.id]);
-        movie.cast = castRows as (Person & { character?: string })[];
-
-        // Fetch Director, Writers, Composers
-        const [crewRows] = await db.query<RowDataPacket[]>(`
-            SELECT p.*, mc.job
-            FROM movie_crew mc
-            JOIN people p ON mc.person_id = p.id
-            WHERE mc.movie_id = ? AND mc.job IN ('Director', 'Writer', 'Screenplay', 'Original Music Composer')
-        `, [movie.id]);
-
-        movie.director = crewRows.find(c => c.job === 'Director') as Person;
-        movie.writers = crewRows.filter(c => c.job === 'Writer' || c.job === 'Screenplay') as Person[];
-        movie.composers = crewRows.filter(c => c.job === 'Original Music Composer') as Person[];
-
-        // Fetch Production Companies
-        const [companyRows] = await db.query<RowDataPacket[]>(`
-            SELECT pc.*
-            FROM movie_production_companies mpc
-            JOIN production_companies pc ON mpc.company_id = pc.id
-            WHERE mpc.movie_id = ?
-        `, [movie.id]);
-        movie.production = companyRows as ProductionCompany[];
-
-        // Fetch Videos
-        const [videoRows] = await db.query<RowDataPacket[]>(`
-            SELECT * FROM videos WHERE entity_type = 'movie' AND entity_id = ?
-        `, [movie.id]);
-        movie.videos = videoRows as Video[];
-
-        return movie;
-
-    } catch (error) {
-        console.error('Error fetching movie data:', error);
-        return null;
-    }
-}
+import { getMovieBySlug } from '@/services/movieService';
 
 const getYear = (dateString: string) => new Date(dateString).getFullYear();
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const movie = await getMovieData(params.slug);
+  const movie = await getMovieBySlug(params.slug);
 
   if (!movie) {
     return {
@@ -149,7 +79,7 @@ const getEmbedUrl = (video: Video) => {
 };
 
 export default async function MovieDetailPage({ params }: { params: { slug: string }}) {
-  const movie = await getMovieData(params.slug);
+  const movie = await getMovieBySlug(params.slug);
 
   if (!movie) {
     notFound();

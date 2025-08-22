@@ -14,50 +14,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { HeroMovieCard } from '@/components/HeroMovieCard';
-import db from '@/lib/db';
-import type { RowDataPacket } from 'mysql2';
+import { getPopularMovies } from '@/services/movieService';
+import { getPopularPeople } from '@/services/personService';
 
-async function getPopularMovies(): Promise<Movie[]> {
-  try {
-    const [rows] = await db.query<RowDataPacket[]>(`
-      SELECT 
-        m.*, 
-        GROUP_CONCAT(DISTINCT g.name) AS genres
-      FROM movies m
-      LEFT JOIN movie_genres mg ON m.id = mg.movie_id
-      LEFT JOIN genres g ON mg.genre_id = g.id
-      WHERE m.poster_path IS NOT NULL
-      GROUP BY m.id
-      ORDER BY m.popularity DESC 
-      LIMIT 10
-    `);
-    
-    return rows.map(row => ({
-      ...row,
-      genres: row.genres ? row.genres.split(',') : [],
-      vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average
-    })) as Movie[];
-  } catch (error) {
-    console.error('Failed to fetch and process movies:', error);
-    return [];
-  }
-}
-
-
-async function getPopularPeople(): Promise<Person[]> {
-  try {
-    const [rows] = await db.query<RowDataPacket[]>(`
-      SELECT p.*
-      FROM people p
-      ORDER BY p.popularity DESC
-      LIMIT 10
-    `);
-    return rows as Person[];
-  } catch (error) {
-    console.error(`Failed to fetch popular people:`, error);
-    return [];
-  }
-}
 
 function MovieCarousel({ popularMovies }: { popularMovies: Movie[] }) {
   if (!popularMovies || popularMovies.length === 0) {

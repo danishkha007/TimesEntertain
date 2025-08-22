@@ -1,9 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import type { RowDataPacket } from 'mysql2';
 import type { Movie } from '@/lib/types';
 import { tvShows } from '@/lib/data'; // Placeholder for TV shows
+import { searchMovies } from '@/services/movieService';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -14,24 +13,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const searchQuery = `%${query}%`;
-    
-    // Search movies by title
-    const [movies] = await db.query<RowDataPacket[]>(`
-      SELECT m.*, GROUP_CONCAT(g.name) as genres
-      FROM movies m
-      LEFT JOIN movie_genres mg ON m.id = mg.movie_id
-      LEFT JOIN genres g ON mg.genre_id = g.id
-      WHERE m.title LIKE ?
-      GROUP BY m.id
-      LIMIT 20
-    `, [searchQuery]);
-
-    const filteredMovies = movies.map(row => ({
-        ...row,
-        genres: row.genres ? row.genres.split(',') : [],
-        vote_average: typeof row.vote_average === 'string' ? parseFloat(row.vote_average) : row.vote_average,
-    })) as Movie[];
+    const filteredMovies = await searchMovies(query);
     
     // Placeholder TV show search
     const lowercaseQuery = query.toLowerCase();
