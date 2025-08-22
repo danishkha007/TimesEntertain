@@ -13,7 +13,7 @@ export function CastMemberCard({ actor }: CastMemberCardProps) {
   const imageUrl = actor.profile_path ? `${process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL}w500${actor.profile_path}` : "https://placehold.co/400x600.png";
   
   return (
-    <Link href={`/person/${slugify(actor.name)}`} className="block group h-full">
+    // <Link href={`/person/${slugify(actor.name)}`} className="block group h-full">
       <Card className="overflow-hidden h-full transition-all duration-300 group-hover:shadow-lg">
         <CardContent className="p-0 flex flex-col h-full">
           <div className="aspect-[2/3] relative">
@@ -36,6 +36,6 @@ export function CastMemberCard({ actor }: CastMemberCardProps) {
           </div>
         </CardContent>
       </Card>
-    </Link>
+    // </Link>
   );
 }

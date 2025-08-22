@@ -80,9 +80,13 @@ export default async function Home() {
   const popularTvShows = [...tvShows]
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 10);
-  const popularActors = await getPopularPeople();
-  const popularDirectors = await getPopularPeople(); // Simplified for now
-  const popularComposers = await getPopularPeople(); // Simplified for now
+  // const popularActors = await getPopularPeople();
+  // const popularDirectors = await getPopularPeople(); // Simplified for now
+  // const popularComposers = await getPopularPeople(); // Simplified for now
+  const popularActors: Person[] = [];
+  const popularDirectors: Person[] = [];
+  const popularComposers: Person[] = [];
+
 
   return (
     <div className="space-y-12">
@@ -168,7 +172,7 @@ export default async function Home() {
           <CarouselNext className="mr-12" />
         </Carousel>
       </section>
-
+      {/* 
       <section>
         <h2 className="text-2xl font-headline font-bold mb-4">
           Popular Actors
@@ -188,7 +192,7 @@ export default async function Home() {
           Popular Music Composers
         </h2>
         <PersonCarousel people={popularComposers} />
-      </section>
+      </section> */}
     </div>
   );
 }
